@@ -29,19 +29,6 @@ end
 GS1 barcode requires Elixir 1.16 or later, and OTP 25 or later. It may work with earlier versions, but it wasn't tested against them.
 
 
-## Installation
-
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `gs1_barcode` to your list of dependencies in `mix.exs`:
-
-```elixir
-def deps do
-  [
-    {:gs1_barcode, "~> 0.1.0"}
-  ]
-end
-```
-
 ## Disclaimer
 
 This software is an independent, open-source implementation and is **not affiliated with, endorsed by, sponsored by, or officially connected to GS1 AISBL or any of its member organizations** in any way.
