@@ -69,7 +69,9 @@ defmodule GS1.Formatter do
     |> build_string(before_ai, after_ai, joiner)
   end
 
-  # TODO: to_GS1_string
+  def to_gs1(%Barcode2D{ais: _ais}, _opts \\ []) do
+    raise "Not implemented."
+  end
 
   # Private section
 
