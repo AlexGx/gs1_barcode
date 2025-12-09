@@ -38,11 +38,9 @@ defmodule GS1.ValidatorConfigTest do
     end
 
     test "set forbidden_ais" do
-      check_fn = fn _ -> true end
-
       config =
         ValidatorConfig.new()
-        |> ValidatorConfig.set_forbidden_ais(["10", "17"])
+        |> ValidatorConfig.set_forbidden_ais(["01", "17"])
 
       assert "01" in config.forbidden_ais
       assert "17" in config.forbidden_ais
