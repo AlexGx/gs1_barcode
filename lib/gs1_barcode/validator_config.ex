@@ -2,13 +2,13 @@ defmodule GS1.ValidatorConfig do
   @moduledoc """
   GS1 Validator config struct.
 
-  Defines the rules used to validate a parsed GS1 barcode.
+  Defines the rules used to validate a parsed GS1 Data Structure.
   Supports builder style, allowing to chain configuration options.
 
   ## Options
 
     * `:fail_fast` - If `true`, validation stops when error found. Defaults to `true`.
-    * `:required_ais` - list of AIs that **must** appear in the barcode.
+    * `:required_ais` - list of AIs that **must** appear in the Data Structure.
     * `:forbidden_ais` - ist of AIs that **must NOT** appear.
     * `:constraints` - map of custom validation functions keyed by AI.
   """

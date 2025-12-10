@@ -1,10 +1,10 @@
 defmodule GS1.FormatterTest do
   use ExUnit.Case, async: true
 
-  alias GS1.Barcode2D
+  alias GS1.DataStructure
   alias GS1.Formatter
 
-  @fixture %Barcode2D{
+  @fixture %DataStructure{
     ais: %{
       "01" => "09876543210987",
       "10" => "BATCH123",
@@ -19,13 +19,13 @@ defmodule GS1.FormatterTest do
                "(01)09876543210987(10)BATCH123(17)251231(21)SN999"
     end
 
-    test "handles an empty barcode" do
-      empty = %Barcode2D{ais: %{}}
+    test "handles an empty ds" do
+      empty = %DataStructure{ais: %{}}
       assert Formatter.to_hri(empty) == ""
     end
 
     test "handles single AI" do
-      single = %Barcode2D{ais: %{"10" => "ABC"}}
+      single = %DataStructure{ais: %{"10" => "ABC"}}
       assert Formatter.to_hri(single) == "(10)ABC"
     end
   end

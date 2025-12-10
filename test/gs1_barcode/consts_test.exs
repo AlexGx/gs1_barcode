@@ -13,7 +13,7 @@ defmodule GS1.ConstsTest do
     end
   end
 
-  describe "FNC1 barcode type sequences" do
+  describe "FNC1 ds type sequences" do
     test "fnc1_gs1_datamatrix_seq returns the correct sequence" do
       assert "]d2" == Consts.fnc1_gs1_datamatrix_seq()
     end

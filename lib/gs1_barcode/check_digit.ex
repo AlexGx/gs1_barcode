@@ -12,8 +12,8 @@ defmodule GS1.CheckDigit do
     true
   """
   @spec valid?(String.t()) :: boolean()
-  def valid?(barcode) when is_binary(barcode) do
-    case byte_size(barcode) do
+  def valid?(code) when is_binary(code) do
+    case byte_size(code) do
       0 ->
         false
 
@@ -21,7 +21,7 @@ defmodule GS1.CheckDigit do
         # even length strings (GTIN-8/12/14) start with weight=3.
         # odd length strings (GTIN-13) start with weight=1.
         start_weight = if rem(len, 2) == 0, do: 3, else: 1
-        check_digits(barcode, start_weight, 0)
+        check_digits(code, start_weight, 0)
     end
   end
 

@@ -1,6 +1,6 @@
-defmodule GS1.Barcode2D do
+defmodule GS1.DataStructure do
   @moduledoc """
-  Decoded 2D GS1 barcode struct, encapsulating AIs, type, prefix, and the original input.
+  Decoded GS1 Data Structure, encapsulating AIs, type, prefix, and the original input.
   """
 
   @type barcode_type ::
@@ -14,7 +14,7 @@ defmodule GS1.Barcode2D do
   * `content`: input exactly as received, including prefix if exists.
   * `type`: barcode type (e.g., `:gs1_datamatrix`).
   * `ais`: A map of AI code (string) => data (string).
-  * `fnc1_prefix`: The FNC1 prefix string (e.g., `"]d2"`), or `<<>>` if none was found.
+  * `fnc1_prefix`: The FNC1 prefix string (e.g., `"]d2"`), or `""` if none was found.
   """
   @type t :: %__MODULE__{
           content: String.t(),

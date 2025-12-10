@@ -1,11 +1,11 @@
-defmodule GS1Barcode do
+defmodule GS1 do
   @moduledoc """
-  Documentation for `GS1Barcode`.
+  Documentation for `GS1`.
   """
 
-  # alias GS1.Barcode2D
+  # alias GS1.
 
   # def parse(_bin), do: nil
 
-  # def validate(barcode2d, validator_config), do: nil
+  # def validate(data_structure, validator_config), do: nil
 end

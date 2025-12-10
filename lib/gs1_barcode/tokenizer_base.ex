@@ -7,7 +7,7 @@ defmodule GS1.Tokenizer.Base do
   even when the actual GS1 AI is longer.
 
   All tokens produced by the tokenizer **must undergo further normalization**
-  to reconstruct the canonical AI.
+  to reconstruct the canonical AI and produce Element Strings.
   """
 
   defmacro __using__(opts \\ []) do
@@ -95,11 +95,11 @@ defmodule GS1.Tokenizer.Base do
         |> optional(gs)
         |> label("AI segment")
 
-      barcode =
+      ds =
         times(ai, min: 1)
         |> eos()
 
-      defparsec :tokenize, barcode
+      defparsec :tokenize, ds
     end
   end
 end

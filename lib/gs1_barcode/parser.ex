@@ -8,11 +8,11 @@ defmodule GS1.Parser do
   by 2 digit "base AI" (than must be normalized and checked and verified with `AIRegistry`) and data part.
   3. **Normalization**: Reconstructs full AIs from tokens (e.g., merging `31` + `03` -> `3103`)
      and performs compliance checks against the `AIRegistry`.
-  4. **Barcode creation**: Returns `Barcode2D` struct suitable for further validation and processing.
+  4. **Date Structure creation**: Returns `DataStructure` suitable for further validation and processing.
   """
 
   alias GS1.AIRegistry
-  alias GS1.Barcode2D
+  alias GS1.DataStructure
   alias GS1.Prefix
   alias GS1.Tokenizer
 
@@ -28,7 +28,7 @@ defmodule GS1.Parser do
           | {:ai_part_non_num, {String.t(), String.t()}}
 
   @doc """
-  Parses a raw GS1 string into a `Barcode2D` struct.
+  Parses a raw GS1 string into a `DataStructure`.
 
   ## Errors
 
@@ -44,7 +44,7 @@ defmodule GS1.Parser do
   * `{:ai_part_non_num, {ai, data}}` - expected digits for an AI suffix during reconstruction,
     but found other characters.
   """
-  @spec parse(String.t()) :: {:ok, Barcode2D.t()} | {:error, error_reason()}
+  @spec parse(String.t()) :: {:ok, DataStructure.t()} | {:error, error_reason()}
   def parse(<<>>), do: {:error, :empty}
 
   def parse(input) when is_binary(input) do
@@ -57,7 +57,7 @@ defmodule GS1.Parser do
             error
 
           {_seen, ais} ->
-            {:ok, Barcode2D.new(input, type, prefix_seq, ais)}
+            {:ok, DataStructure.new(input, type, prefix_seq, ais)}
         end
 
       {:error, reason, _rest, _context, {_line, _line_offset}, byte_offset} ->

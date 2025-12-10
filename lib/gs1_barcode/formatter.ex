@@ -6,7 +6,7 @@ defmodule GS1.Formatter do
   Supports custom layouts for printing labels (e.g., ZPL, HTML, or multi-line displays).
   """
 
-  alias GS1.Barcode2D
+  alias GS1.DataStructure
 
   @typedoc """
   Options for formatting HRI.
@@ -27,7 +27,7 @@ defmodule GS1.Formatter do
           | {:joiner, String.t()}
 
   @doc """
-  Formats `Barcode2D` struct into a formatted HRI string.
+  Formats `DataStructure` struct into a formatted HRI string.
   Options allow for filtering specific fields or generating custom printer commands.
 
   ## Options
@@ -37,26 +37,26 @@ defmodule GS1.Formatter do
   ## Examples
 
   ### 1. Standard HRI with default opts
-      iex> GS1.Formatter.to_hri(barcode)
+      iex> GS1.Formatter.to_hri(ds)
       "(01)09876543210987(10)BATCH123"
 
   ### 2. Including specific fields Only)
-      iex> GS1.Formatter.to_hri(barcode, include: ["01"])
+      iex> GS1.Formatter.to_hri(ds, include: ["01"])
       "(01)09876543210987"
 
   ### 3. Visual Spacing
-      iex> GS1.Formatter.to_hri(barcode, before_ai: " ", after_ai: ": ")
+      iex> GS1.Formatter.to_hri(ds, before_ai: " ", after_ai: ": ")
       " (01): 09876543210987 (10): BATCH123"
 
   ### 4. ZPL / Printer Format. Generates a ZPL block where each line is a field
-      iex> GS1.Formatter.to_hri(barcode,
+      iex> GS1.Formatter.to_hri(ds,
       ...>   before_ai: "^FO50,50^ADN,36,20^FD", # Start Field command
       ...>   joiner: "^FS\\n"                    # Field Separator + Newline
       ...> )
       "^FO50,50^ADN,36,20^FD(01)09876543210987^FS\\n^FO50,50^ADN,36,20^FD(10)BATCH123"
   """
-  @spec to_hri(Barcode2D.t(), [hri_opts()]) :: String.t()
-  def to_hri(%Barcode2D{ais: ais}, opts \\ []) do
+  @spec to_hri(DataStructure.t(), [hri_opts()]) :: String.t()
+  def to_hri(%DataStructure{ais: ais}, opts \\ []) do
     include = Keyword.get(opts, :include)
     before_ai = Keyword.get(opts, :before_ai, "")
     after_ai = Keyword.get(opts, :after_ai, "")
@@ -69,7 +69,7 @@ defmodule GS1.Formatter do
     |> build_string(before_ai, after_ai, joiner)
   end
 
-  def to_gs1(%Barcode2D{ais: _ais}, _opts \\ []) do
+  def to_gs1(%DataStructure{ais: _ais}, _opts \\ []) do
     raise "Not implemented."
   end
 

@@ -3,8 +3,8 @@ defmodule GS1.Prefix do
   Binary-matching GS1 prefix utils.
   """
 
-  alias GS1.Barcode2D
   alias GS1.Consts
+  alias GS1.DataStructure
 
   @fnc1_prefixes [
     {:gs1_datamatrix, Consts.fnc1_gs1_datamatrix_seq()},
@@ -24,7 +24,7 @@ defmodule GS1.Prefix do
     iex> GS1.Prefix.match("0104600494694202")
     {:unknown, "", "0104600494694202"}
   """
-  @spec match(binary()) :: {Barcode2D.barcode_type(), binary(), binary()}
+  @spec match(binary()) :: {DataStructure.barcode_type(), binary(), binary()}
   def match(bin), do: do_match(bin)
 
   for {type, seq} <- @fnc1_prefixes do
