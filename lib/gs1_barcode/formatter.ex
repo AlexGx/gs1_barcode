@@ -93,6 +93,7 @@ defmodule GS1.Formatter do
     See `t:gs1_opts/0` for details.
 
   ## Logic
+
   1. Prepends the Symbology Identifier (Prefix).
   2. Iterates through AIs.
   3. If an AI is **variable-length** (e.g., AI 10 or 21) AND it is **not** the last element,

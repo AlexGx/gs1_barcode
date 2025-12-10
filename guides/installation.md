@@ -6,7 +6,6 @@ This guide walks you through setting up GS1 barcode in your Elixir application.
 
 - Elixir 1.16 or later
 - OTP 25 or later
-- An Ecto-based application with PostgreSQL, SQLite, or MySQL
 
 ## Add Dependency
 
