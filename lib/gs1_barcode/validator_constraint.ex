@@ -14,7 +14,6 @@ defmodule GS1.Validator.Constraint do
   """
 
   alias GS1.DateUtils
-  alias DateUtils
 
   @type predicate :: (String.t() -> boolean())
 
