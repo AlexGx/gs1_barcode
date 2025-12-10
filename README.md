@@ -1,4 +1,4 @@
-# GS1 barcode for parsing, validation and formatting
+# GS1 lib for parsing, validation and formatting
 
 ![GS1Barcode](https://raw.githubusercontent.com/AlexGx/gs1_barcode/master/artwork/banner.jpg)
 
