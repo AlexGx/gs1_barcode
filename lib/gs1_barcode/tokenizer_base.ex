@@ -90,13 +90,13 @@ defmodule GS1.Tokenizer.Base do
         |> unwrap_and_tag(:ai_var)
         |> label("variable-length AI")
 
-      ai =
+      segment =
         choice([fixed_ai, var_ai])
         |> optional(gs)
         |> label("AI segment")
 
       ds =
-        times(ai, min: 1)
+        times(segment, min: 1)
         |> eos()
 
       defparsec :tokenize, ds
