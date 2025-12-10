@@ -13,13 +13,13 @@ defmodule GS1.ValidatorConfig do
     * `:constraints` - map of custom validation functions keyed by AI.
   """
 
-  @type constraint_fun :: (String.t() -> boolean())
+  alias GS1.Validator.Constraint
 
   @type t :: %__MODULE__{
           fail_fast: boolean(),
           required_ais: [String.t()],
           forbidden_ais: [String.t()],
-          constraints: %{String.t() => constraint_fun()}
+          constraints: %{String.t() => Constraint.predicate()}
         }
 
   defstruct fail_fast: true,
@@ -72,14 +72,13 @@ defmodule GS1.ValidatorConfig do
 
   @doc """
   Adds a custom validation constraint for a specific AI.
-  See `t:constraint_fun/1`.
 
   ## Example
 
       validator_config
       |> put_constraint("01", fn val -> String.length(val) == 14 end)
   """
-  @spec put_constraint(t(), String.t(), (any() -> any())) :: t()
+  @spec put_constraint(t(), String.t(), Constraint.predicate()) :: t()
   def put_constraint(%__MODULE__{} = config, ai, fun) when is_binary(ai) and is_function(fun, 1),
     do: %__MODULE__{config | constraints: Map.put(config.constraints, ai, fun)}
 end

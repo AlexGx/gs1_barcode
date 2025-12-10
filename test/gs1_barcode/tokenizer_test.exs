@@ -4,7 +4,7 @@ defmodule GS1.TokenizerTest do
   alias GS1.Consts
   alias GS1.Tokenizer
 
-  @gs GS1.Consts.gs_symbol()
+  @gs Consts.gs_symbol()
 
   describe "tokenize/1 - Fixed Length AIs" do
     test "parses a single fixed-length AI (GTIN-14)" do
