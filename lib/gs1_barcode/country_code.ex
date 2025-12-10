@@ -15,11 +15,13 @@ defmodule GS1.CountryCode do
   @typedoc """
   Returns a list with countries (usually one elem) assigned to country code or `nil` if no match.
   """
-  @type lookup_result :: [country_info()] | nil
+  @type lookup_result :: {:ok, [country_info()]} | {:error, term()}
 
   @usa {"USA", "US", "USA", "840"}
   @japan {"Japan", "JP", "JPN", "392"}
   @china {"China", "CN", "CHN", "156"}
+  @poland {"Poland", "PL", "POL", "616"}
+  @uk {"United Kingdom", "GB", "GBR", "826"}
 
   @country_codes [
     {{001, 019}, [@usa]},
@@ -60,7 +62,7 @@ defmodule GS1.CountryCode do
     {{489}, [{"Hong Kong", "HK", "HKG", "344"}]},
     # original Japanese Article Number range
     {{490, 499}, [@japan]},
-    {{500, 509}, [{"United Kingdom", "GB", "GBR", "826"}]},
+    {{500, 509}, [@uk]},
     {{520, 521}, [{"Greece", "GR", "GRC", "300"}]},
     {{528}, [{"Lebanon", "LB", "LBN", "422"}]},
     {{529}, [{"Cyprus", "CY", "CYP", "196"}]},
@@ -77,7 +79,7 @@ defmodule GS1.CountryCode do
        {"Faroe Islands", "FO", "FRO", "234"},
        {"Greenland", "GL", "GRL", "304"}
      ]},
-    {{590}, [{"Poland", "PL", "POL", "616"}]},
+    {{590}, [@poland]},
     {{594}, [{"Romania", "RO", "ROU", "642"}]},
     {{599}, [{"Hungary", "HU", "HUN", "348"}]},
     {{600, 601}, [{"South Africa", "ZA", "ZAF", "710"}]},
@@ -164,8 +166,19 @@ defmodule GS1.CountryCode do
     {{958}, [{"Macao", "MO", "MAC", "446"}]}
   ]
 
+  # add special cases for GTIN-8 (poland & uk) ?
+  # 960–9624	GS1 UK: GTIN-8 allocations
+  # 9625–9626 GS1 Poland: GTIN-8 allocations
+
   @spec lookup(pos_integer()) :: lookup_result()
-  def lookup(c), do: lookup_int(c)
+  def lookup(code) when is_integer(code) do
+    case lookup_int(code) do
+      nil -> {:error, :not_found}
+      found -> {:ok, found}
+    end
+  end
+
+  def lookup(_), do: {:error, :invalid}
 
   for {range_or_single, info} <- @country_codes do
     escaped_info = Macro.escape(info)

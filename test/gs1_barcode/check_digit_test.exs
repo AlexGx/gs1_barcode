@@ -28,6 +28,8 @@ defmodule GS1.CheckDigitTest do
     test "validates SSCC (18 digits - Even length, starts weight 3)" do
       # logistics / pallet codes
       assert CheckDigit.valid?("000000000000000017")
+      assert CheckDigit.valid?("009528765123456786")
+      assert CheckDigit.valid?("342603046212345678")
     end
   end
 

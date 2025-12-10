@@ -18,14 +18,18 @@ defmodule GS1.CheckDigit do
         false
 
       len ->
-        # even length strings (GTIN-8/12/14) start with weight=3.
-        # odd length strings (GTIN-13) start with weight=1.
+        # even length strings (SSCC/GTIN-8,12,14) start with weight=3.
+        # odd length strings GTIN-13 start with weight=1
         start_weight = if rem(len, 2) == 0, do: 3, else: 1
         check_digits(code, start_weight, 0)
     end
   end
 
   def valid?(_), do: false
+
+  # add check digit computation ?
+
+  # Private section
 
   # at end check sum is divisible by 10
   defp check_digits(<<>>, _weight, sum), do: rem(sum, 10) == 0

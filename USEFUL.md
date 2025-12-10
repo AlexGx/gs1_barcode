@@ -3,6 +3,7 @@ https://github.com/msupply-foundation/open-msupply/blob/c0484b06af58315782ff1c9d
 https://github.com/msupply-foundation/open-msupply/issues/6848
 
 # todo:
-- code detection
-- iso countries registry
+- rich docs
+- more explain on parser
 - main module most used funcs
+- why choose? section
