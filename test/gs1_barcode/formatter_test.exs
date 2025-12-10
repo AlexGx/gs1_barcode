@@ -1,6 +1,7 @@
 defmodule GS1.FormatterTest do
   use ExUnit.Case, async: true
 
+  alias GS1.Consts
   alias GS1.DataStructure
   alias GS1.Formatter
 
@@ -93,6 +94,87 @@ defmodule GS1.FormatterTest do
         )
 
       assert result == "^FD(01)09876543210987^FS^FD(10)BATCH123"
+    end
+  end
+
+  @gs Consts.gs_symbol()
+
+  defp ds_mock(ais, prefix \\ "]d2") do
+    %DataStructure{ais: ais, fnc1_prefix: prefix}
+  end
+
+  describe "to_gs1/2" do
+    test "single fixed-length AI (e.g., 01 GTIN)" do
+      # fixed length AIs never need a separator
+      input = ds_mock(%{"01" => "09876543210987"})
+      assert Formatter.to_gs1(input) == "]d20109876543210987"
+    end
+
+    test "single variable-length AI (e.g., 10 Batch)" do
+      # even though 10 is variable, it is the last element, so no separator is added
+      input = ds_mock(%{"10" => "BATCH123"})
+      assert Formatter.to_gs1(input) == "]d210BATCH123"
+    end
+
+    test "sequence: Fixed (01) -> Variable (10)" do
+      # 01 is fixed -> No separator
+      # 10 is last -> No separator
+      input = ds_mock(%{"01" => "09876543210987", "10" => "BATCH123"})
+
+      expected = "]d2010987654321098710BATCH123"
+      assert Formatter.to_gs1(input) == expected
+    end
+
+    test "sequence: Variable (10) -> Variable (21)" do
+      # 10 is variable and followed by another field -> NEEDS SEPARATOR
+      # 21 is last -> No separator
+      input = ds_mock(%{"10" => "BATCH", "21" => "SERIAL"})
+
+      expected = "]d2" <> "10BATCH" <> @gs <> "21SERIAL"
+      assert Formatter.to_gs1(input) == expected
+    end
+
+    test "sequence: Variable (10) -> Fixed (11)" do
+      # 10 is variable and followed by another field -> NEEDS SEPARATOR
+      # 11 is fixed and last -> No separator
+      input = ds_mock(%{"10" => "BATCH", "11" => "231231"})
+
+      expected = "]d2" <> "10BATCH" <> @gs <> "11231231"
+      assert Formatter.to_gs1(input) == expected
+    end
+
+    test "complex mixed chain: Var (10) -> Fixed (11) -> Var (21)" do
+      input = ds_mock(%{"10" => "BATCH", "11" => "231231", "21" => "SN"})
+
+      expected = "]d2" <> "10BATCH" <> @gs <> "11231231" <> "21SN"
+      assert Formatter.to_gs1(input) == expected
+    end
+
+    test "handles :include option to filter AIs" do
+      input = ds_mock(%{"01" => "GTIN", "10" => "BATCH", "21" => "SN"})
+
+      # should only encode 10 and 21
+      opts = [include: ["10", "21"]]
+
+      expected = "]d2" <> "10BATCH" <> @gs <> "21SN"
+      assert Formatter.to_gs1(input, opts) == expected
+    end
+
+    test "handles :prefix option" do
+      input = ds_mock(%{"10" => "ABC"})
+      assert Formatter.to_gs1(input, prefix: "]C1") == "]C110ABC"
+    end
+
+    test "handles :group_separator option" do
+      input = ds_mock(%{"10" => "BATCH", "21" => "SN"})
+
+      opts = [group_separator: "|"]
+
+      assert Formatter.to_gs1(input, opts) == "]d210BATCH|21SN"
+    end
+
+    test "returns only prefix if ais map is empty" do
+      assert Formatter.to_gs1(ds_mock(%{})) == "]d2"
     end
   end
 end
