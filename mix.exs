@@ -98,7 +98,7 @@ defmodule GS1Barcode.MixProject do
 
   defp description do
     """
-    GS1 barcode lib for parsing, validation and formatting.
+    GS1 lib for parsing, validation and formatting.
     """
   end
 end
