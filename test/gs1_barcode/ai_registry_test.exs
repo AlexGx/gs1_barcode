@@ -3,9 +3,26 @@ defmodule GS1.AIRegistryTest do
 
   alias GS1.AIRegistry
 
-  describe "fixed_length_ais/0" do
+  describe "fixed_len_ai?/1 tests" do
+    test "fixed_len_ai?/1 checks" do
+      assert AIRegistry.fixed_len_ai?("00")
+      assert AIRegistry.fixed_len_ai?("01")
+      assert AIRegistry.fixed_len_ai?("02")
+      assert AIRegistry.fixed_len_ai?("03")
+
+      assert AIRegistry.fixed_len_ai?("12")
+      assert AIRegistry.fixed_len_ai?("13")
+      assert AIRegistry.fixed_len_ai?("17")
+      refute AIRegistry.fixed_len_ai?("99")
+      refute AIRegistry.fixed_len_ai?("3105")
+      refute AIRegistry.fixed_len_ai?("30")
+      refute AIRegistry.fixed_len_ai?("3454")
+    end
+  end
+
+  describe "fixed_len_ais/0" do
     test "returns the map of fixed length AIs" do
-      ais = %{} = AIRegistry.fixed_length_ais()
+      ais = %{} = AIRegistry.fixed_len_ais()
 
       assert ais["00"] == 20
       assert ais["01"] == 16

@@ -3,7 +3,7 @@ defmodule GS1.AIRegistry do
   GS1 Application Identifier Registry.
   """
 
-  @fixed_length_ais %{
+  @fixed_len_ais %{
     # identification
     "00" => 20,
     "01" => 16,
@@ -29,8 +29,20 @@ defmodule GS1.AIRegistry do
     "41" => 16
   }
 
-  @spec fixed_length_ais :: %{String.t() => pos_integer()}
-  def fixed_length_ais, do: @fixed_length_ais
+  @spec fixed_len_ais :: %{String.t() => pos_integer()}
+  def fixed_len_ais, do: @fixed_len_ais
+
+  @doc """
+  Checks if an AI has a fixed length.
+  Generated at compile-time from @fixed_len_ais to ensure performance.
+  """
+  @spec fixed_len_ai?(String.t()) :: boolean()
+
+  for {ai, _length} <- @fixed_len_ais do
+    def fixed_len_ai?(unquote(ai)), do: true
+  end
+
+  def fixed_len_ai?(_), do: false
 
   @ai_check_digit [
     # SSCC

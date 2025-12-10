@@ -1,6 +1,6 @@
 defmodule GS1.Prefix do
   @moduledoc """
-  Binary-matching GS1 prefix utils.
+  GS1 prefix (Symbology Identifier) utils.
   """
 
   alias GS1.Consts

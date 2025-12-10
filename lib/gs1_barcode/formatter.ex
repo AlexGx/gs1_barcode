@@ -1,11 +1,13 @@
 defmodule GS1.Formatter do
   @moduledoc """
   Formatting utilities for transforming GS1 barcode into various
-  representations, primarily **HRI (Human Readable Interpretation)**.
+  representations.
 
   Supports custom layouts for printing labels (e.g., ZPL, HTML, or multi-line displays).
   """
 
+  alias GS1.AIRegistry
+  alias GS1.Consts
   alias GS1.DataStructure
 
   @typedoc """
@@ -66,11 +68,59 @@ defmodule GS1.Formatter do
     |> Map.to_list()
     |> filter_ais(include)
     |> List.keysort(0)
-    |> build_string(before_ai, after_ai, joiner)
+    |> build_hri_string(before_ai, after_ai, joiner)
   end
 
-  def to_gs1(%DataStructure{ais: _ais}, _opts \\ []) do
-    raise "Not implemented."
+  @typedoc """
+  Options for formatting GS1.
+
+  * `:include` - list of AIs to include. Default `nil` (all).
+  * `:prefix` - prefix (e.g., "]d2"). Default is the struct's `fnc1_prefix`.
+  * `:group_separator` - character or string used to terminate variable length fields.
+    Default is `Consts.gs_symbol()` (`\\x1D`).
+  """
+  @type gs1_opts ::
+          {:include, [String.t()] | nil}
+          | {:prefix, String.t()}
+          | {:group_separator, String.t()}
+
+  @doc """
+  Constructs  GS1 encoded string from the Data Structure.
+  Automatically handles the insertion of GS for var-length AIs.
+
+  ## Options
+
+    See `t:gs1_opts/0` for details.
+
+  ## Logic
+  1. Prepends the Symbology Identifier (Prefix).
+  2. Iterates through AIs.
+  3. If an AI is **variable-length** (e.g., AI 10 or 21) AND it is **not** the last element,
+     adds the `group_separator`.
+  4. Fixed-length AIs (e.g., 01 or 11) do not receive a separator.
+
+  ## Examples
+      iex> GS1.Formatter.to_gs1(ds)
+      "]d2010987654321098710BATCH123"
+
+      # Variable length field followed by another field gets a separator:
+      iex> GS1.Formatter.to_gs1(ds_with_serial)
+      "]d2010987654321098710BATCH123\\x1D21SERIAL"
+  """
+  @spec to_gs1(DataStructure.t(), [gs1_opts()]) :: String.t()
+  def to_gs1(%DataStructure{fnc1_prefix: fnc1_prefix, ais: ais}, opts \\ []) do
+    include = Keyword.get(opts, :include)
+    prefix = Keyword.get(opts, :prefix, fnc1_prefix)
+    group_separator = Keyword.get(opts, :group_separator, Consts.gs_symbol())
+
+    encoded =
+      ais
+      |> Map.to_list()
+      |> filter_ais(include)
+      |> List.keysort(0)
+      |> build_gs1_string(group_separator)
+
+    prefix <> encoded
   end
 
   # Private section
@@ -81,9 +131,22 @@ defmodule GS1.Formatter do
     Enum.filter(ais, fn {ai, _val} -> ai in whitelist end)
   end
 
-  defp build_string(ais, before_ai, after_ai, joiner) do
+  defp build_hri_string(ais, before_ai, after_ai, joiner) do
     Enum.map_join(ais, joiner, fn {ai, data} ->
       "#{before_ai}(#{ai})#{after_ai}#{data}"
     end)
+  end
+
+  defp build_gs1_string([], _sep), do: ""
+
+  # last elem
+  defp build_gs1_string([{ai, data}], _sep) do
+    ai <> data
+  end
+
+  defp build_gs1_string([{ai, data} | rest], sep) do
+    # if AI is NOT in the fixed len list, it is var and needs a separator
+    suffix = if AIRegistry.fixed_len_ai?(ai), do: "", else: sep
+    ai <> data <> suffix <> build_gs1_string(rest, sep)
   end
 end

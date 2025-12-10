@@ -4,5 +4,5 @@ defmodule GS1.Tokenizer do
   """
 
   use GS1.Tokenizer.Base,
-    fixed_ais: GS1.AIRegistry.fixed_length_ais()
+    fixed_ais: GS1.AIRegistry.fixed_len_ais()
 end
