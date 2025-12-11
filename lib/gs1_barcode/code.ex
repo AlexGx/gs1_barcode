@@ -116,7 +116,7 @@ defmodule GS1.Code do
   end
 
   @doc "Returns the 'Base GTIN' (unit level) for matching."
-  def to_lookup_key(code) do
+  def to_key(code) do
     case detect(code) do
       # convert UPC to EAN-13
       {:ok, :gtin12} ->

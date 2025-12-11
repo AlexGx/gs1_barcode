@@ -7,3 +7,4 @@ https://github.com/msupply-foundation/open-msupply/issues/6848
 - more explain on parser
 - main module most used funcs
 - why choose? section
+- calculate check digit function
