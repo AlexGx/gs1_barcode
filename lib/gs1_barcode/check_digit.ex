@@ -31,6 +31,40 @@ defmodule GS1.CheckDigit do
 
   def valid?(_), do: false
 
+  @doc """
+  Calculates check digit.
+
+  ## Examples
+
+      iex> GS1.CheckDigit.calculate("01234567890")
+      {:ok, 5}
+
+      iex> GS1.CheckDigit.calculate("ABC")
+      {:error, :non_digit}
+  """
+  @spec calculate(String.t()) :: {:ok, non_neg_integer()} | {:error, term()}
+  def calculate(code) when is_binary(code) do
+    case byte_size(code) do
+      0 ->
+        {:error, :empty}
+
+      len ->
+        # same as in `valid?/1`.
+        start_weight = if rem(len, 2) != 0, do: 3, else: 1
+
+        case sum_digits(code, start_weight, 0) do
+          {:ok, sum} ->
+            # smallest num to add to make sum divisible by 10
+            remainder = rem(sum, 10)
+            check_digit = if remainder == 0, do: 0, else: 10 - remainder
+            {:ok, check_digit}
+
+          error ->
+            error
+        end
+    end
+  end
+
   # Private section
 
   defp sum_digits(<<>>, _weight, sum), do: {:ok, sum}

@@ -68,7 +68,7 @@ defmodule GS1.CheckDigitTest do
     end
 
     test "handles short strings correctly based on mod 10 math" do
-      # "123": Len 3 (Odd). W: 1, 3, 1.
+      # "123": Len 3 (Odd). weights: 1, 3, 1.
       # (1*1) + (2*3) + (3*1) = 1 + 6 + 3 = 10. 10 % 10 == 0.
       # this is technically a valid Mod10 checksum, even if not a real GS1 length.
       assert CheckDigit.valid?("123")
@@ -80,6 +80,44 @@ defmodule GS1.CheckDigitTest do
 
     test "handles empty string" do
       refute CheckDigit.valid?("")
+    end
+  end
+
+  describe "calculate/1" do
+    test "calculates check digit for GTIN-8 (7 digits)" do
+      assert {:ok, 4} = CheckDigit.calculate("9638507")
+    end
+
+    test "calculates check digit for GTIN-12 (11 digits)" do
+      assert {:ok, 5} = CheckDigit.calculate("01234567890")
+    end
+
+    test "calculates check digit for GTIN-13 (12 digits)" do
+      assert {:ok, 3} = CheckDigit.calculate("629104150021")
+    end
+
+    test "calculates check digit for GTIN-14 (13 digits)" do
+      assert {:ok, 2} = CheckDigit.calculate("1001234567890")
+    end
+
+    test "calculates check digit for SSCC (17 digits)" do
+      assert {:ok, 7} = CheckDigit.calculate("00000000000000001")
+      assert {:ok, 6} =  CheckDigit.calculate("00952876512345678")
+      assert {:ok, 8} =   CheckDigit.calculate("34260304621234567")
+    end
+
+    test "returns 0 when sum is exactly divisible by 10" do
+      assert {:ok, 0} = CheckDigit.calculate("55")
+    end
+
+    test "returns error for empty string" do
+      assert {:error, :empty} = CheckDigit.calculate("")
+    end
+
+    test "returns error for non-digit characters" do
+      assert {:error, :non_digit} = CheckDigit.calculate("123A5")
+      assert {:error, :non_digit} = CheckDigit.calculate("12-34")
+      assert {:error, :non_digit} = CheckDigit.calculate("   ")
     end
   end
 end
