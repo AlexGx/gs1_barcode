@@ -92,7 +92,7 @@ defmodule GS1.Parser do
   end
 
   defp normalize_ai(ai, data) do
-    case AIRegistry.ai_length(ai) do
+    case AIRegistry.length_by_base_ai(ai) do
       @base_ai_len ->
         {:ok, {ai, data}}
 

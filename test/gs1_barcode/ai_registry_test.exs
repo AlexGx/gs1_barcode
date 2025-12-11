@@ -56,32 +56,47 @@ defmodule GS1.AIRegistryTest do
   describe "ai_length/1" do
     test "identifies known 2-digit AIs" do
       # Test with exact match
-      assert AIRegistry.ai_length("00") == 2
-      assert AIRegistry.ai_length("01") == 2
-      # Test with suffix
-      assert AIRegistry.ai_length("0012345") == 2
-      # Test other known 2-digit prefixes
-      assert AIRegistry.ai_length("10") == 2
-      assert AIRegistry.ai_length("37") == 2
-      assert AIRegistry.ai_length("99") == 2
+      assert AIRegistry.length_by_base_ai("00") == 2
+      assert AIRegistry.length_by_base_ai("01") == 2
+      # only "base AIs"
+      assert AIRegistry.length_by_base_ai("0012345") == nil
+      # test other known 2-digit prefixes
+      assert AIRegistry.length_by_base_ai("10") == 2
+      assert AIRegistry.length_by_base_ai("37") == 2
+      assert AIRegistry.length_by_base_ai("99") == 2
     end
 
     test "identifies known 3-digit AIs" do
       # "23" is in the list of 3-digit prefixes
-      assert AIRegistry.ai_length("23") == 3
-      assert AIRegistry.ai_length("235") == 3
+      assert AIRegistry.length_by_base_ai("23") == 3
 
-      assert AIRegistry.ai_length("41") == 3
-      assert AIRegistry.ai_length("71") == 3
+      # but not by full
+      assert AIRegistry.length_by_base_ai("235") == nil
+
+      assert AIRegistry.length_by_base_ai("41") == 3
+      assert AIRegistry.length_by_base_ai("71") == 3
     end
 
     test "defaults to 4-digit AIs for unknown prefixes" do
       # "80" is not in the 2 or 3 digit list
-      assert AIRegistry.ai_length("80") == 4
-      assert AIRegistry.ai_length("8005") == 4
+      assert AIRegistry.length_by_base_ai("80") == 4
+      # but not by full
+      assert AIRegistry.length_by_base_ai("8005") == nil
 
-      # "55" is not in the list
-      refute AIRegistry.ai_length("55") == 4
+      refute AIRegistry.length_by_base_ai("55") == 4
+    end
+
+    test "unknown AIs" do
+      assert AIRegistry.length_by_base_ai("04") == nil
+
+      # rethink behavior ?
+      # assert AIRegistry.ai_length("2351") == nil
+      # assert nil == AIRegistry.ai_length("236")
+    end
+
+    test "other cases" do
+      assert nil == AIRegistry.length_by_base_ai("")
+      assert nil == AIRegistry.length_by_base_ai(nil)
     end
   end
 
