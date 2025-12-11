@@ -1,5 +1,5 @@
 defmodule GS1.ValidationErrorTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   alias GS1.ValidationError
 
   describe "struct validation" do

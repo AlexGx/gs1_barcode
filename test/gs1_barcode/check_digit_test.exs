@@ -1,5 +1,5 @@
 defmodule GS1.CheckDigitTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   alias GS1.CheckDigit
 
@@ -102,8 +102,8 @@ defmodule GS1.CheckDigitTest do
 
     test "calculates check digit for SSCC (17 digits)" do
       assert {:ok, 7} = CheckDigit.calculate("00000000000000001")
-      assert {:ok, 6} =  CheckDigit.calculate("00952876512345678")
-      assert {:ok, 8} =   CheckDigit.calculate("34260304621234567")
+      assert {:ok, 6} = CheckDigit.calculate("00952876512345678")
+      assert {:ok, 8} = CheckDigit.calculate("34260304621234567")
     end
 
     test "returns 0 when sum is exactly divisible by 10" do

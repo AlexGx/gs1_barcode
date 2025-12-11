@@ -180,6 +180,8 @@ defmodule GS1.CountryCode do
 
   def lookup(_), do: {:error, :invalid}
 
+  # Private section
+
   for {range_or_single, info} <- @country_codes do
     escaped_info = Macro.escape(info)
 

@@ -27,6 +27,8 @@ defmodule GS1.Prefix do
   @spec match(binary()) :: {DataStructure.barcode_type(), binary(), binary()}
   def match(bin), do: do_match(bin)
 
+  # Private section
+
   for {type, seq} <- @fnc1_prefixes do
     defp do_match(<<unquote(seq), rest::binary>>) do
       {unquote(type), unquote(seq), rest}

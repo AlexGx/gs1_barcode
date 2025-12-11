@@ -8,7 +8,7 @@ defmodule GS1.ConstsTest do
       assert "\u001D" == Consts.gs_symbol()
 
       <<char_code::integer>> = Consts.gs_symbol()
-      # ASCII 29 in decimal is the Group Separator (GS)
+      # ASCII 29 in decimal is the Group Separator (<GS>)
       assert char_code == 29
     end
   end

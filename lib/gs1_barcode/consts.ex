@@ -3,13 +3,13 @@ defmodule GS1.Consts do
   GS1 const values.
   """
 
-  # control characters
+  # Control characters
 
   @doc "ASCII Group Separator (ASCII 29, <GS>)"
   @spec gs_symbol :: String.t()
   def gs_symbol, do: "\u001D"
 
-  # barcode type sequences
+  # Barcode type sequences
 
   @spec fnc1_gs1_datamatrix_seq :: String.t()
   def fnc1_gs1_datamatrix_seq, do: "]d2"

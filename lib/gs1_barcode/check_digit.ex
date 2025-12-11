@@ -52,16 +52,7 @@ defmodule GS1.CheckDigit do
         # same as in `valid?/1`.
         start_weight = if rem(len, 2) != 0, do: 3, else: 1
 
-        case sum_digits(code, start_weight, 0) do
-          {:ok, sum} ->
-            # smallest num to add to make sum divisible by 10
-            remainder = rem(sum, 10)
-            check_digit = if remainder == 0, do: 0, else: 10 - remainder
-            {:ok, check_digit}
-
-          error ->
-            error
-        end
+        do_calculate(code, start_weight)
     end
   end
 
@@ -81,4 +72,17 @@ defmodule GS1.CheckDigit do
   end
 
   defp sum_digits(_, _, _), do: {:error, :non_digit}
+
+  defp do_calculate(code, start_weight) do
+    case sum_digits(code, start_weight, 0) do
+      {:ok, sum} ->
+        # smallest num to add to make sum divisible by 10
+        remainder = rem(sum, 10)
+        check_digit = if remainder == 0, do: 0, else: 10 - remainder
+        {:ok, check_digit}
+
+      error ->
+        error
+    end
+  end
 end

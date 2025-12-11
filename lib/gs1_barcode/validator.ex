@@ -28,7 +28,9 @@ defmodule GS1.Validator do
     end
   end
 
-  # required section
+  # Private section
+
+  # required
 
   # no `fail_fast` because it is first in chain
   # defp check_required([_ | _] = errors, _ds, %ValidatorConfig{fail_fast: true}), do: errors
@@ -48,7 +50,7 @@ defmodule GS1.Validator do
     end)
   end
 
-  # forbidden section
+  # forbidden
 
   defp check_forbidden([_ | _] = errors, _ds, %ValidatorConfig{fail_fast: true}), do: errors
 
@@ -68,7 +70,7 @@ defmodule GS1.Validator do
     end)
   end
 
-  # check digit section
+  # check digit
 
   defp check_digits([_ | _] = errors, _ds, %ValidatorConfig{fail_fast: true}), do: errors
 
@@ -92,7 +94,7 @@ defmodule GS1.Validator do
     end)
   end
 
-  # check date section
+  # check date
 
   defp check_dates([_ | _] = errors, _ds, %ValidatorConfig{fail_fast: true}), do: errors
 
@@ -116,7 +118,7 @@ defmodule GS1.Validator do
     end)
   end
 
-  # constraints section
+  # constraints
 
   defp check_constraints([_ | _] = errors, _ds, %ValidatorConfig{fail_fast: true}),
     do: errors
