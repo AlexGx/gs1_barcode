@@ -8,8 +8,8 @@ defmodule GS1.CheckDigit do
 
   ## Examples
 
-    iex> GS1.CheckDigit.valid?("012345678905")
-    true
+      iex> GS1.CheckDigit.valid?("012345678905")
+      true
   """
   @spec valid?(String.t()) :: boolean()
   def valid?(code) when is_binary(code) do

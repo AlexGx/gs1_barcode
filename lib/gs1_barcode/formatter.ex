@@ -52,8 +52,8 @@ defmodule GS1.Formatter do
 
   ### 4. ZPL / Printer Format. Generates a ZPL block where each line is a field
       iex> GS1.Formatter.to_hri(ds,
-      ...>   before_ai: "^FO50,50^ADN,36,20^FD", # Start Field command
-      ...>   joiner: "^FS\\n"                    # Field Separator + Newline
+      ...>    before_ai: "^FO50,50^ADN,36,20^FD", # Start Field command
+      ...>    joiner: "^FS\\n"                    # Field Separator + Newline
       ...> )
       "^FO50,50^ADN,36,20^FD(01)09876543210987^FS\\n^FO50,50^ADN,36,20^FD(10)BATCH123"
   """

@@ -60,4 +60,14 @@ defmodule GS1Test do
 
     assert true
   end
+
+  test "long test 2" do
+    input =
+      "01095060001343521124100721S12345678241E003/0023121820000313167000031116300009000191241007-310101"
+
+    # res = Parser.parse(input)
+    # IO.inspect(res)
+
+    assert true
+  end
 end

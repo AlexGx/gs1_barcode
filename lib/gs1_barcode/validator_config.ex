@@ -2,7 +2,7 @@ defmodule GS1.ValidatorConfig do
   @moduledoc """
   GS1 Validator config struct.
 
-  Defines the rules used to validate a parsed GS1 Data Structure.
+  Defines the rules used to validate a parsed `GS1.DataStructure`.
   Supports builder style, allowing to chain configuration options.
 
   ## Options
@@ -28,12 +28,17 @@ defmodule GS1.ValidatorConfig do
             constraints: %{}
 
   @doc """
-  Creates a new `ValidatorConfig` with optional default values.
+  Creates a new `GS1.ValidatorConfig` with optional default values.
 
-  ## Examples
+  ## Example
 
-      iex> GS1.ValidatorConfig.new(fail_fast: false)
-      %GS1.ValidatorConfig{fail_fast: false}
+      iex> GS1.ValidatorConfig.new(fail_fast: false, required_ais: ["01", "21"])
+      %GS1.ValidatorConfig{
+        fail_fast: false,
+        required_ais: ["01", "21"],
+        forbidden_ais: [],
+        constraints: %{}
+      }
   """
   @spec new(keyword()) :: t()
   def new(opts \\ []) do

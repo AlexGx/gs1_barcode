@@ -8,7 +8,7 @@ defmodule GS1.Parser do
   by 2 digit "base AI" (than must be normalized and checked and verified with `AIRegistry`) and data part.
   3. **Normalization**: Reconstructs full AIs from tokens (e.g., merging `31` + `03` -> `3103`)
      and performs compliance checks against the `AIRegistry`.
-  4. **Date Structure creation**: Returns `DataStructure` suitable for further validation and processing.
+  4. **Date Structure creation**: Returns `GS1.DataStructure` suitable for further validation and processing.
   """
 
   alias GS1.AIRegistry

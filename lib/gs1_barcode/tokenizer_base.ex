@@ -10,6 +10,32 @@ defmodule GS1.Tokenizer.Base do
   to reconstruct the canonical AI and produce Element Strings.
   """
 
+  @typedoc """
+  The type of the Application Identifier (AI).
+  * `:ai_fixed` - The AI has a fixed length.
+  * `:ai_var` - The AI has a variable length (delimited by FNC1/GS or end of string).
+  """
+  @type token_kind :: :ai_fixed | :ai_var
+
+  @typedoc """
+  The raw data tuple extracted by the tokenizer.
+  Format: `{ai_prefix, data_content}`.
+  """
+  @type token_data :: {String.t(), String.t()}
+
+  @typedoc "A single parsed token. Wraps the kind and the data tuple."
+  @type token :: {token_kind(), token_data()}
+
+  @typedoc """
+  The result returned by `tokenize/2`.
+  Includes the list of tokens, remaining binary, context, line, and offset.
+  """
+  @type tokenize_result ::
+          {:ok, [token()], rest :: binary(), context :: map(), line :: pos_integer(),
+           byte_offset :: pos_integer()}
+          | {:error, reason :: String.t(), rest :: binary(), context :: map(),
+             line :: pos_integer(), byte_offset :: pos_integer()}
+
   defmacro __using__(opts \\ []) do
     {evaluated_opts, _bindings} = Code.eval_quoted(opts, [], __CALLER__)
 
@@ -99,6 +125,10 @@ defmodule GS1.Tokenizer.Base do
         times(segment, min: 1)
         |> eos()
 
+      @doc """
+      Tokenizes a raw GS1 input string.
+      """
+      # @spec tokenize(binary(), keyword()) :: GS1.Tokenizer.Base.tokenize_result()
       defparsec :tokenize, ds
     end
   end
