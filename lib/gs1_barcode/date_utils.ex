@@ -1,6 +1,8 @@
 defmodule GS1.DateUtils do
   @moduledoc """
-  Utilities for handling date formats specified by GS1,
+  Utilities for handling date formats specified by GS1.
+
+  See: 7.12 Determination of century in dates
   """
 
   @type gs1_format :: :yymmdd | :yymmd0

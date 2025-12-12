@@ -1,10 +1,18 @@
-defmodule GS1.CountryCode do
+defmodule GS1.CompanyPrefix do
   @moduledoc """
-  Provides lookup of GS1 company-prefix ranges to infer the country by
-  GS1 Member Organization associated with a given barcode prefix.
+  Provides range-based lookup of GS1 Company Prefix allocations in order to
+  *associate* a barcode prefix with the GS1 Member Organization (MO) that
+  administers the corresponding prefix range.
 
-  The dataset is based on the public information from the wiki article
-  [GS1 List of Assigned Country Codes](https://en.wikipedia.org/wiki/List_of_GS1_country_codes) and other public sources.
+  This association may be used as an informational hint about the country
+  in which the GS1 Company Prefix was issued, but it is **not** a structural
+  property of the barcode and **must not** be interpreted as the country of
+  origin of the product.
+
+  The dataset is based on the public information from:
+  [GS1 List of Assigned Country Codes](https://en.wikipedia.org/wiki/List_of_GS1_country_codes),
+  [GS1 Company Prefix](https://www.gs1.org/standards/id-keys/company-prefix),
+  and other public sources.
   """
 
   @typedoc """
@@ -166,9 +174,16 @@ defmodule GS1.CountryCode do
     {{958}, [{"Macao", "MO", "MAC", "446"}]}
   ]
 
-  # add special cases for GTIN-8 (poland & uk) ?
-  # 960–9624	GS1 UK: GTIN-8 allocations
-  # 9625–9626 GS1 Poland: GTIN-8 allocations
+  # special cases for gtin13?
+  # 00001 – 00009
+  # 0001 – 0009
+
+  # 1.4.3 GS1-8 Prefix
+
+  # 20000028 2000000-2990000
+
+  # For 12-digit GTINs, and only 12-digit GTINs, there is an implied leading zero.
+  # For example, given the 12-digit GTIN 614141234561, the GS1 Prefix is 061, not 614.
 
   @spec lookup(pos_integer()) :: lookup_result()
   def lookup(code) when is_integer(code) do

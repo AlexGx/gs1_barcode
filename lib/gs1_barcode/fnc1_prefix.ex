@@ -1,4 +1,4 @@
-defmodule GS1.Prefix do
+defmodule GS1.FNC1Prefix do
   @moduledoc """
   GS1 prefix (Symbology Identifier) utils.
   """
@@ -18,10 +18,10 @@ defmodule GS1.Prefix do
 
   ## Examples
 
-      iex> GS1.Prefix.match("]d20104600494694202")
+      iex> GS1.FNC1Prefix.match("]d20104600494694202")
       {:gs1_datamatrix, "]d2", "0104600494694202"}
 
-      iex> GS1.Prefix.match("0104600494694202")
+      iex> GS1.FNC1Prefix.match("0104600494694202")
       {:unknown, "", "0104600494694202"}
   """
   @spec match(binary()) :: {DataStructure.barcode_type(), binary(), binary()}

@@ -1,6 +1,6 @@
 defmodule GS1.Parser do
   @moduledoc """
-  Parser for GS1 barcode strings.
+  Parser for GS1 Data Structures.
 
   Parsing pipeline:
   1. **Prefix matching**: Identifies the Symbology Identifier (e.g., `]d2` for DataMatrix).
@@ -13,7 +13,7 @@ defmodule GS1.Parser do
 
   alias GS1.AIRegistry
   alias GS1.DataStructure
-  alias GS1.Prefix
+  alias GS1.FNC1Prefix
   alias GS1.Tokenizer
 
   @base_ai_len 2
@@ -48,7 +48,7 @@ defmodule GS1.Parser do
   def parse(<<>>), do: {:error, :empty}
 
   def parse(input) when is_binary(input) do
-    {type, prefix_seq, rest} = Prefix.match(input)
+    {type, prefix_seq, rest} = FNC1Prefix.match(input)
 
     case Tokenizer.tokenize(rest) do
       {:ok, tokens, _rest, _context, _line, _byte_offset} ->

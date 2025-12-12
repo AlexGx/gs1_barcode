@@ -1,6 +1,7 @@
 https://ref.gs1.org/ai/
 https://github.com/msupply-foundation/open-msupply/blob/c0484b06af58315782ff1c9ddba98877c2cb7dca/server/util/src/gs1.rs#L51
 https://github.com/msupply-foundation/open-msupply/issues/6848
+https://ref.gs1.org/standards/genspecs/
 
 # todo:
 - more rich docs
@@ -9,3 +10,12 @@ https://github.com/msupply-foundation/open-msupply/issues/6848
 - why choose? section
 - calculate check digit function
 - generator funcs
+- disclaimer to MO
+
+- more test cases to tokenizer/parser:
+When FNC1 is NOT PERMITTED
+❌ After a fixed-length Application Identifier (AI)
+❌ At the end of the data string
+❌ Two consecutive FNC1 characters
+❌ Within the data content of an AI
+Any of the above constitutes a violation of the GS1 General Specifications.

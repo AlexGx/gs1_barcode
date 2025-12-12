@@ -1,6 +1,6 @@
 defmodule GS1.Formatter do
   @moduledoc """
-  Formatting utilities for transforming GS1 barcode into various
+  Formatting utilities for transforming GS1 Data Structures into various
   representations.
 
   Supports custom layouts for printing labels (e.g., ZPL, HTML, or multi-line displays).

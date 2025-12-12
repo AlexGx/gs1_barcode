@@ -1,11 +1,24 @@
 defmodule GS1 do
   @moduledoc """
-  Documentation for `GS1`.
+  A toolkit for parsing, validating, and working with GS1 Data Structures and codes.
+
+  This module serves as a **namespace** for the lib. It does not contain business logic itself.
+  Please refer to the specific modules below for functionality.
+
+  ## Key Modules
+
+  * `GS1.Code`
+  * `GS1.Parser`
+  * `GS1.Validator`
+  * `GS1.Formatter`
+
+  # DSL
+
+  * `GS1.Validator.Constraint`
+
+  ## Utils
+
+  * `GS1.DateUtils`
+
   """
-
-  # alias GS1.
-
-  # def parse(_bin), do: nil
-
-  # def validate(data_structure, validator_config), do: nil
 end
