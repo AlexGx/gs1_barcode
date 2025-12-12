@@ -48,9 +48,11 @@ defmodule GS1.Code do
   Normalizes valid GTIN-8 to a GTIN-12
   Returns error if the input is not a valid GTIN or cannot be normalized to this dimension.
 
-  **Note:** While this pads the string to 12 digits, a padded GTIN-8
-  is not semantically equivalent to a UPC-A (GTIN-12).
-  **Use with caution when you understand what you achieve**.
+    ## Example
+
+      iex> GS1.Code.to_gtin12("40052441")
+      {:ok, "000040052441"}
+
   """
   @spec to_gtin12(String.t()) :: {:ok, String.t()} | {:error, detect_error() | normalize_error()}
   def to_gtin12(code) do
@@ -73,8 +75,6 @@ defmodule GS1.Code do
   with check digit calculation. No additional PLI logic check applied.
 
   Returns error if the input is not a valid GTIN or cannot be normalized to this dimension.
-
-  **Use with caution when you understand what you achieve**.
 
   ## Examples
 
@@ -167,6 +167,7 @@ defmodule GS1.Code do
 
       iex> GS1.Code.payload("4006381333931")
       {:ok, "400638133393"}
+
   """
   @spec payload(String.t()) :: {:ok, String.t()} | {:error, detect_error()}
   def payload(code) do
@@ -188,6 +189,7 @@ defmodule GS1.Code do
 
       iex> GS1.Code.detect_internal("4006381333931")
       {:ok, false}
+
   """
   @spec detect_internal(String.t()) :: {:ok, boolean()} | {:error, detect_error()}
   def detect_internal(code) do
@@ -205,7 +207,7 @@ defmodule GS1.Code do
   @doc """
   Looks up the country (Member Organization) based on the prefix.
   """
-  @spec country_lookup(String.t()) :: CompanyPrefix.lookup_result() | {:error, detect_error()}
+  @spec country_lookup(String.t()) :: CompanyPrefix.mo_result() | {:error, detect_error()}
   def country_lookup(code) do
     case detect(code) do
       # {:ok, :gtin8} -> #special case for gtin-8 Poland and UK ?

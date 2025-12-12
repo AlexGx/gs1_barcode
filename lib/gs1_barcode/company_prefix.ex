@@ -23,7 +23,7 @@ defmodule GS1.CompanyPrefix do
   @typedoc """
   Returns a list with countries (usually one elem) assigned to country code or `nil` if no match.
   """
-  @type lookup_result :: {:ok, [country_info()]} | {:error, term()}
+  @type mo_result :: {:ok, [country_info()]} | {:error, term()}
 
   @usa {"USA", "US", "USA", "840"}
   @japan {"Japan", "JP", "JPN", "392"}
@@ -31,7 +31,7 @@ defmodule GS1.CompanyPrefix do
   @poland {"Poland", "PL", "POL", "616"}
   @uk {"United Kingdom", "GB", "GBR", "826"}
 
-  @country_codes [
+  @prefix_mo [
     {{001, 019}, [@usa]},
     # United States drugs
     {{030, 039}, [@usa]},
@@ -174,20 +174,55 @@ defmodule GS1.CompanyPrefix do
     {{958}, [{"Macao", "MO", "MAC", "446"}]}
   ]
 
-  # special cases for gtin13?
-  # 00001 – 00009
-  # 0001 – 0009
-
   # 1.4.3 GS1-8 Prefix
+  @prefix_gs1_8 [
+    {{000, 099}, :rcn},
+    # {{100, 199}, :gtin8},
+    {{200, 299}, :rcn},
+    # {{300, 951}, :gtin8},
+    {{952}, :demo},
+    # {{953, 976}, :gtin8},
+    # {{977, 999}, :reserved},
+  ]
+
+  # temp
+  def prefix_gs1_8, do: @prefix_gs1_8
+
+  @prefix_gs1 [
+    {{020, 029}, :rcn},
+    {{040, 049}, :rcn},
+    {{200, 299}, :rcn},
+    {{952}, :demo},
+    {{977}, :issn},
+    {{978, 979},	:isbn},
+    {{980}, :refund_receipt},
+    {{981, 983}, :coupon},
+    {{990, 999}, :coupon_local}
+  ]
+
+  # temp
+  def prefix_gs1, do: @prefix_gs1
+
+  # lookup_prefix
+  # lookup_mo
+
+  # match only by prefix and binary_size, no check/validation performed
+
+  # is_rcn?
+  # is_demo?
+  # is_issn?
+  # is_isbn?
+  # is_coupon?
+
 
   # 20000028 2000000-2990000
 
   # For 12-digit GTINs, and only 12-digit GTINs, there is an implied leading zero.
   # For example, given the 12-digit GTIN 614141234561, the GS1 Prefix is 061, not 614.
 
-  @spec lookup(pos_integer()) :: lookup_result()
+  @spec lookup(pos_integer()) :: mo_result()
   def lookup(code) when is_integer(code) do
-    case lookup_int(code) do
+    case lookup_mo(code) do
       nil -> {:error, :not_found}
       found -> {:ok, found}
     end
@@ -197,23 +232,25 @@ defmodule GS1.CompanyPrefix do
 
   # Private section
 
-  for {range_or_single, info} <- @country_codes do
+  # lookup_
+
+  for {range_or_single, info} <- @prefix_mo do
     escaped_info = Macro.escape(info)
 
     case range_or_single do
       # range {min, max} is `in min..max` guard
       {min, max} ->
-        defp lookup_int(country_code) when country_code in unquote(min)..unquote(max) do
+        defp lookup_mo(country_code) when country_code in unquote(min)..unquote(max) do
           unquote(escaped_info)
         end
 
       # single int {val} is pattern match
       {single} ->
-        defp lookup_int(unquote(single)) do
+        defp lookup_mo(unquote(single)) do
           unquote(escaped_info)
         end
     end
   end
 
-  defp lookup_int(_), do: nil
+  defp lookup_mo(_), do: nil
 end
