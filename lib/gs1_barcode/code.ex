@@ -80,7 +80,7 @@ defmodule GS1.Code do
       iex> GS1.Code.to_gtin13("12345670")
       {:ok, "0000012345670"}
 
-      # GTIN-14 is reduced to GTIN-13 (payload + new check digit)
+      # GTIN-14 is reduced to GTIN-13 (payload + new check digit calculated)
       iex> GS1.Code.to_gtin13("10123456789019")
       {:ok, "0123456789012"}
   """

@@ -1,9 +1,9 @@
 defmodule GS1.DataStructureTest do
   use ExUnit.Case, async: true
 
-  alias GS1.DataStructure
-
   doctest GS1.DataStructure
+
+  alias GS1.DataStructure
 
   @ai_data [{"01", "12345678901234"}, {"17", "251231"}]
   @prefix "]d2"
