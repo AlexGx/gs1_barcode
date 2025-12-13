@@ -110,6 +110,8 @@ defmodule GS1.Code do
   Normalizes a valid GTIN-8, 12, or 13 to a GTIN-14 with a given Packaging Level Indicator (PLI).
 
   A PLI can be an int [0, 9] or its character representation.
+  * **PLI 0:** Simply pads the input to 14 digits (preserves existing check digit).
+  * **PLI 1-9:** Constructs a new hierarchical code and **recalculates the Check Digit**.
 
   Returns error if the input is not a valid GTIN or cannot be normalized.
 
@@ -178,7 +180,14 @@ defmodule GS1.Code do
   end
 
   @doc """
-  Lookups country (Member Organization) based on the prefix.
+  Lookups country (MO) based on the code prefix.
+  Returns `nil` non-country ranges and for GTIN-8 as they use a distinct prefix list.
+
+  ## Example
+
+      iex> GS1.Code.country("4006381333931")
+      [{"Germany", "DE", "DEU", "276"}]
+
   """
   @spec country(String.t()) :: CompanyPrefix.country_mo() | {:error, detect_error()}
   def country(code) do
@@ -195,6 +204,17 @@ defmodule GS1.Code do
     end
   end
 
+  @doc """
+  Lookups usage range of the code (e.g. :rcn, :isbn, :coupon).
+
+  # Examples
+
+      iex> GS1.Code.range("2000000000039")
+      :rcn
+
+      iex> GS1.Code.range("9781449369996")
+      :isbn
+  """
   @spec range(binary()) :: CompanyPrefix.range_type() | {:error, detect_error()}
   def range(code) do
     case detect(code) do
@@ -207,21 +227,76 @@ defmodule GS1.Code do
     end
   end
 
+  @doc """
+  Checks if the valid code belongs to a Restricted Circulation Number (RCN) range.
+
+  RCNs are used for internal purposes (e.g., variable measure items like meat/produce sold by weight,
+  or internal company codes) and should not be used in open trade.
+
+  ## Examples
+
+      iex> GS1.Code.rcn?("2001234567893")
+      true
+
+      iex> GS1.Code.rcn?("4006381333931") # Standard trade item
+      false
+  """
   @spec rcn?(String.t()) :: boolean()
   def rcn?(code), do: range(code) == :rcn
 
+  @doc """
+  Checks if valid code is in range reserved for demonstration or testing.
+
+  ## Examples
+
+      iex> GS1.Code.demo?("9529999199997")
+      true
+  """
   @spec demo?(String.t()) :: boolean()
   def demo?(code), do: range(code) == :demo
 
+  @doc """
+  Checks if valid code is an ISSN (International Standard Serial Number).
+
+  ## Examples
+
+      iex> GS1.Code.issn?("9771234567003")
+      true
+  """
   @spec issn?(String.t()) :: boolean()
   def issn?(code), do: range(code) == :issn
 
+  @doc """
+  Checks if valid code is an ISBN (International Standard Book Number).
+
+  ## Examples
+
+      iex> GS1.Code.isbn?("9783161484100")
+      true
+  """
   @spec isbn?(String.t()) :: boolean()
   def isbn?(code), do: range(code) == :isbn
 
+  @doc """
+  Checks if valid code is a coupon. Detects various coupon formats, including global
+  coupons and restricted circulation coupons often used within specific geographic regions.
+
+  ## Examples
+
+      iex> GS1.Code.coupon?("9812345678902")
+      true
+  """
   @spec coupon?(String.t()) :: boolean()
   def coupon?(code), do: range(code) in [:coupon, :coupon_local]
 
+  @doc """
+  Checks if valid code is a Refund Receipt.
+
+  ## Examples
+
+      iex> GS1.Code.refund?("9800004500008")
+      true
+  """
   @spec refund?(String.t()) :: boolean()
   def refund?(code), do: range(code) == :refund_receipt
 
