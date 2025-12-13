@@ -21,9 +21,21 @@ defmodule GS1.CompanyPrefix do
   @type country_info :: {String.t(), String.t(), String.t(), String.t()}
 
   @typedoc """
-  Returns a list with countries (usually one elem) assigned to country code or `nil` if no match.
+  List of MO countries (usually one elem) associated with a prefix, or `nil` if the prefix is unassigned.
   """
-  @type mo_result :: {:ok, [country_info()]} | {:error, term()}
+  @type country_mo :: [country_info()] | nil
+
+  @typedoc """
+  Special purpose range types:
+  * `:rcn` - Restricted Circulation Numbers (internal use)
+  * `:issn` - International Standard Serial Number (periodicals)
+  * `:isbn` - International Standard Book Number
+  * `:coupon`, `:coupon_local` - coupons
+  * `:refund_receipt` - refund receipt
+  * `:demo` - used for demonstrations
+  """
+  @type range_type ::
+          :rcn | :demo | :issn | :isbn | :refund_receipt | :coupon | :coupon_local | nil
 
   @usa {"USA", "US", "USA", "840"}
   @japan {"Japan", "JP", "JPN", "392"}
@@ -31,7 +43,7 @@ defmodule GS1.CompanyPrefix do
   @poland {"Poland", "PL", "POL", "616"}
   @uk {"United Kingdom", "GB", "GBR", "826"}
 
-  @prefix_mo [
+  @prefix_mo_gs1 [
     {{001, 019}, [@usa]},
     # United States drugs
     {{030, 039}, [@usa]},
@@ -174,77 +186,85 @@ defmodule GS1.CompanyPrefix do
     {{958}, [{"Macao", "MO", "MAC", "446"}]}
   ]
 
-  # 1.4.3 GS1-8 Prefix
-  @prefix_gs1_8 [
-    {{000, 099}, :rcn},
-    # {{100, 199}, :gtin8},
-    {{200, 299}, :rcn},
-    # {{300, 951}, :gtin8},
-    {{952}, :demo},
-    # {{953, 976}, :gtin8},
-    # {{977, 999}, :reserved},
-  ]
-
-  # temp
-  def prefix_gs1_8, do: @prefix_gs1_8
-
   @prefix_gs1 [
     {{020, 029}, :rcn},
     {{040, 049}, :rcn},
     {{200, 299}, :rcn},
     {{952}, :demo},
     {{977}, :issn},
-    {{978, 979},	:isbn},
+    {{978, 979}, :isbn},
     {{980}, :refund_receipt},
     {{981, 983}, :coupon},
     {{990, 999}, :coupon_local}
   ]
 
-  # temp
-  def prefix_gs1, do: @prefix_gs1
+  # GTIN-8 has own ranges (see genspec: 1.4.3 GS1-8 Prefix)
+  @prefix_gs1_8 [
+    {{000, 099}, :rcn},
+    {{200, 299}, :rcn},
+    {{952}, :demo}
+  ]
 
-  # lookup_prefix
-  # lookup_mo
+  @doc """
+  Lookups GS1 Country (MO) by int prefix.
 
-  # match only by prefix and binary_size, no check/validation performed
+  ## Example
 
-  # is_rcn?
-  # is_demo?
-  # is_issn?
-  # is_isbn?
-  # is_coupon?
+      iex> GS1.CompanyPrefix.country(590)
+      [{"Poland", "PL", "POL", "616"}]
 
+  """
+  @spec country(pos_integer()) :: country_mo()
+  def country(p) when is_integer(p), do: lookup_mo(p)
 
-  # 20000028 2000000-2990000
+  def country(_), do: nil
 
-  # For 12-digit GTINs, and only 12-digit GTINs, there is an implied leading zero.
-  # For example, given the 12-digit GTIN 614141234561, the GS1 Prefix is 061, not 614.
+  @doc """
+  Lookups GS1 range by int prefix.
+  Used for **non-GTIN-8** codes.
 
-  @spec lookup(pos_integer()) :: mo_result()
-  def lookup(code) when is_integer(code) do
-    case lookup_mo(code) do
-      nil -> {:error, :not_found}
-      found -> {:ok, found}
-    end
-  end
+  ## Example
 
-  def lookup(_), do: {:error, :invalid}
+      iex> GS1.CompanyPrefix.range(200)
+      :rcn
+
+  """
+  @spec range(non_neg_integer()) :: range_type()
+  def range(p) when is_integer(p), do: lookup_range(p)
+
+  def range(_), do: nil
+
+  @doc """
+  Lookups GS1-8 range by int prefix.
+  Used for **GTIN-8** codes.
+  GTIN-8 has different allocation ranges GTIN-13.
+
+  ## Example
+
+      iex> GS1.CompanyPrefix.range8(001)
+      :rcn
+
+  """
+  @spec range8(non_neg_integer()) :: nil | :rcn | :demo
+  def range8(p) when is_integer(p), do: lookup_range8(p)
+
+  def range8(_), do: nil
 
   # Private section
 
-  # lookup_
+  # lookup_mo generator
 
-  for {range_or_single, info} <- @prefix_mo do
+  for {range_or_single, info} <- @prefix_mo_gs1 do
     escaped_info = Macro.escape(info)
 
     case range_or_single do
       # range {min, max} is `in min..max` guard
       {min, max} ->
-        defp lookup_mo(country_code) when country_code in unquote(min)..unquote(max) do
+        defp lookup_mo(p) when p in unquote(min)..unquote(max) do
           unquote(escaped_info)
         end
 
-      # single int {val} is pattern match
+      # single {val} pattern match
       {single} ->
         defp lookup_mo(unquote(single)) do
           unquote(escaped_info)
@@ -253,4 +273,48 @@ defmodule GS1.CompanyPrefix do
   end
 
   defp lookup_mo(_), do: nil
+
+  # lookup_range generator
+
+  for {range_or_single, info} <- @prefix_gs1 do
+    escaped_info = Macro.escape(info)
+
+    case range_or_single do
+      # range {min, max} is `in min..max` guard
+      {min, max} ->
+        defp lookup_range(p) when p in unquote(min)..unquote(max) do
+          unquote(escaped_info)
+        end
+
+      # single {val} pattern match
+      {single} ->
+        defp lookup_range(unquote(single)) do
+          unquote(escaped_info)
+        end
+    end
+  end
+
+  defp lookup_range(_), do: nil
+
+  # lookup_range8 generator
+
+  for {range_or_single, info} <- @prefix_gs1_8 do
+    escaped_info = Macro.escape(info)
+
+    case range_or_single do
+      # range {min, max} is `in min..max` guard
+      {min, max} ->
+        defp lookup_range8(p) when p in unquote(min)..unquote(max) do
+          unquote(escaped_info)
+        end
+
+      # single {val} pattern match
+      {single} ->
+        defp lookup_range8(unquote(single)) do
+          unquote(escaped_info)
+        end
+    end
+  end
+
+  defp lookup_range8(_), do: nil
 end

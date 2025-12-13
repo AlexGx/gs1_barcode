@@ -1,6 +1,8 @@
 defmodule GS1.DateUtilsTest do
   use ExUnit.Case, async: true
 
+  doctest GS1.DateUtils
+
   alias GS1.DateUtils
 
   describe "valid?/2 with :yymmdd format" do

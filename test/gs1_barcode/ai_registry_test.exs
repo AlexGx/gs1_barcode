@@ -1,6 +1,8 @@
 defmodule GS1.AIRegistryTest do
   use ExUnit.Case, async: true
 
+  doctest GS1.AIRegistry
+
   alias GS1.AIRegistry
 
   describe "fixed_len_ai?/1 tests" do

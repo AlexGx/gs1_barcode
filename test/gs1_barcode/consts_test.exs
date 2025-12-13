@@ -1,6 +1,8 @@
 defmodule GS1.ConstsTest do
   use ExUnit.Case, async: true
 
+  doctest GS1.Consts
+
   alias GS1.Consts
 
   describe "gs_symbol/0" do

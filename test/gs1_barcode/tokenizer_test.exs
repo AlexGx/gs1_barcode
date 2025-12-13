@@ -1,6 +1,8 @@
 defmodule GS1.TokenizerTest do
   use ExUnit.Case, async: true
 
+  doctest GS1.Tokenizer
+
   alias GS1.Consts
   alias GS1.Tokenizer
 

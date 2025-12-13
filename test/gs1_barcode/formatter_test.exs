@@ -1,6 +1,8 @@
 defmodule GS1.FormatterTest do
   use ExUnit.Case, async: true
 
+  doctest GS1.Formatter
+
   alias GS1.Consts
   alias GS1.DataStructure
   alias GS1.Formatter

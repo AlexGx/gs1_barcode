@@ -1,6 +1,8 @@
 defmodule GS1.CheckDigitTest do
   use ExUnit.Case, async: true
 
+  doctest GS1.CheckDigit
+
   alias GS1.CheckDigit
 
   describe "valid?/1 with standard GS1 formats" do

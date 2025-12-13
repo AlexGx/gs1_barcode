@@ -1,6 +1,8 @@
 defmodule GS1.Validator.ConstraintTest do
   use ExUnit.Case, async: true
 
+  doctest GS1.Validator.Constraint
+
   import GS1.Validator.Constraint
 
   describe "is_num/0" do

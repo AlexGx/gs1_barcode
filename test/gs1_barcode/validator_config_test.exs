@@ -1,6 +1,8 @@
 defmodule GS1.ValidatorConfigTest do
   use ExUnit.Case, async: true
 
+  doctest GS1.ValidatorConfig
+
   alias GS1.ValidatorConfig
 
   describe "builder test" do

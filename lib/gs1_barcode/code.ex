@@ -9,7 +9,7 @@ defmodule GS1.Code do
   alias GS1.CheckDigit
   alias GS1.CompanyPrefix
 
-  @typedoc "Detected type."
+  @typedoc "Detected code type."
   @type code_type ::
           :gtin8
           | :gtin12
@@ -52,7 +52,6 @@ defmodule GS1.Code do
 
       iex> GS1.Code.to_gtin12("40052441")
       {:ok, "000040052441"}
-
   """
   @spec to_gtin12(String.t()) :: {:ok, String.t()} | {:error, detect_error() | normalize_error()}
   def to_gtin12(code) do
@@ -84,7 +83,6 @@ defmodule GS1.Code do
       # GTIN-14 is reduced to GTIN-13 (payload + new check digit)
       iex> GS1.Code.to_gtin13("10123456789019")
       {:ok, "0123456789012"}
-
   """
   @spec to_gtin13(String.t()) :: {:ok, String.t()} | {:error, detect_error() | normalize_error()}
   def to_gtin13(code) do
@@ -161,13 +159,12 @@ defmodule GS1.Code do
   def to_gtin14(_, _), do: {:error, :invalid_pli}
 
   @doc """
-  Returns the barcode digits excluding the check digit.
+  Returns payload (part without check digit) of valid code.
 
-  ## Examples
+  ## Example
 
       iex> GS1.Code.payload("4006381333931")
       {:ok, "400638133393"}
-
   """
   @spec payload(String.t()) :: {:ok, String.t()} | {:error, detect_error()}
   def payload(code) do
@@ -181,44 +178,52 @@ defmodule GS1.Code do
   end
 
   @doc """
-  Detects if the code is valid and belongs to a Restricted Circulation Number (RCN) range.
-  Typically used for internal variable measure items (020-029)
-  or internal restricted use (040-049).
-
-  ## Example
-
-      iex> GS1.Code.detect_internal("4006381333931")
-      {:ok, false}
-
+  Lookups country (Member Organization) based on the prefix.
   """
-  @spec detect_internal(String.t()) :: {:ok, boolean()} | {:error, detect_error()}
-  def detect_internal(code) do
+  @spec country(String.t()) :: CompanyPrefix.country_mo() | {:error, detect_error()}
+  def country(code) do
     case detect(code) do
+      {:ok, :gtin8} ->
+        nil
+
       {:ok, type} ->
-        prefix_as_int = prefix_code(code, type) |> String.to_integer()
-        internal? = prefix_as_int in 020..029 or prefix_as_int in 040..049
-        {:ok, internal?}
+        prefix = extract_prefix_gs1(code, type) |> String.to_integer()
+        CompanyPrefix.country(prefix)
 
       error ->
         error
     end
   end
 
-  @doc """
-  Looks up the country (Member Organization) based on the prefix.
-  """
-  @spec country_lookup(String.t()) :: CompanyPrefix.mo_result() | {:error, detect_error()}
-  def country_lookup(code) do
+  @spec range(binary()) :: CompanyPrefix.range_type() | {:error, detect_error()}
+  def range(code) do
     case detect(code) do
-      # {:ok, :gtin8} -> #special case for gtin-8 Poland and UK ?
       {:ok, type} ->
-        prefix_as_int = prefix_code(code, type) |> String.to_integer()
-        CompanyPrefix.lookup(prefix_as_int)
+        prefix = extract_prefix_gs1(code, type) |> String.to_integer()
+        if type == :gtin8, do: CompanyPrefix.range8(prefix), else: CompanyPrefix.range(prefix)
 
       error ->
         error
     end
   end
+
+  @spec rcn?(String.t()) :: boolean()
+  def rcn?(code), do: range(code) == :rcn
+
+  @spec demo?(String.t()) :: boolean()
+  def demo?(code), do: range(code) == :demo
+
+  @spec issn?(String.t()) :: boolean()
+  def issn?(code), do: range(code) == :issn
+
+  @spec isbn?(String.t()) :: boolean()
+  def isbn?(code), do: range(code) == :isbn
+
+  @spec coupon?(String.t()) :: boolean()
+  def coupon?(code), do: range(code) in [:coupon, :coupon_local]
+
+  @spec refund?(String.t()) :: boolean()
+  def refund?(code), do: range(code) == :refund_receipt
 
   # Private section
 
@@ -231,14 +236,19 @@ defmodule GS1.Code do
   end
 
   # SSCC & GTIN-14: drop first digit and grab next 3
-  defp prefix_code(<<_::binary-size(1), prefix::binary-size(3), _::binary>>, :sscc), do: prefix
-  defp prefix_code(<<_::binary-size(1), prefix::binary-size(3), _::binary>>, :gtin14), do: prefix
+  defp extract_prefix_gs1(<<_::binary-size(1), prefix::binary-size(3), _::binary>>, :sscc),
+    do: prefix
+
+  defp extract_prefix_gs1(<<_::binary-size(1), prefix::binary-size(3), _::binary>>, :gtin14),
+    do: prefix
 
   # GTIN-12: grab the first 2 digits, prepend "0" (may resolve to US or internal-like)
-  defp prefix_code(<<prefix_part::binary-size(2), _::binary>>, :gtin12), do: "0" <> prefix_part
+  defp extract_prefix_gs1(<<prefix_part::binary-size(2), _::binary>>, :gtin12),
+    do: "0" <> prefix_part
 
-  defp prefix_code(<<prefix::binary-size(3), _::binary>>, :gtin13), do: prefix
-  defp prefix_code(<<prefix::binary-size(3), _::binary>>, :gtin8), do: prefix
+  # all other first 3 digits
+  defp extract_prefix_gs1(<<prefix::binary-size(3), _::binary>>, :gtin13), do: prefix
+  defp extract_prefix_gs1(<<prefix::binary-size(3), _::binary>>, :gtin8), do: prefix
 
   # build 13-digit payload for gtin14, pads lead with extra zeros gtin8 and gtin12
   defp build_payload14(pli, code) do

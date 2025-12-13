@@ -39,18 +39,22 @@ defmodule GS1.Formatter do
   ## Examples
 
   ### 1. Standard HRI with default opts
+      iex> ds = %GS1.DataStructure{ais: %{"01" => "09876543210987", "10" => "BATCH123"}}
       iex> GS1.Formatter.to_hri(ds)
       "(01)09876543210987(10)BATCH123"
 
   ### 2. Including specific fields Only)
+      iex> ds = %GS1.DataStructure{ais: %{"01" => "09876543210987", "10" => "LOT-10"}}
       iex> GS1.Formatter.to_hri(ds, include: ["01"])
       "(01)09876543210987"
 
   ### 3. Visual Spacing
+      iex> ds = %GS1.DataStructure{ais: %{"01" => "09876543210987", "10" => "BATCH123"}}
       iex> GS1.Formatter.to_hri(ds, before_ai: " ", after_ai: ": ")
       " (01): 09876543210987 (10): BATCH123"
 
   ### 4. ZPL / Printer Format. Generates a ZPL block where each line is a field
+      iex> ds = %GS1.DataStructure{ais: %{"01" => "09876543210987", "10" => "BATCH123"}}
       iex> GS1.Formatter.to_hri(ds,
       ...>    before_ai: "^FO50,50^ADN,36,20^FD", # Start Field command
       ...>    joiner: "^FS\\n"                    # Field Separator + Newline
@@ -101,10 +105,12 @@ defmodule GS1.Formatter do
   4. Fixed-length AIs (e.g., 01 or 11) do not receive a separator.
 
   ## Examples
+      iex> ds = %GS1.DataStructure{ais: %{"01" => "09876543210987", "10" => "BATCH123"}, fnc1_prefix: "]d2"}
       iex> GS1.Formatter.to_gs1(ds)
       "]d2010987654321098710BATCH123"
 
       # Variable length field followed by another field gets a separator:
+      iex> ds_with_serial = %GS1.DataStructure{ais: %{"01" => "09876543210987", "10" => "BATCH123", "21" => "SERIAL"}, fnc1_prefix: "]d2"}
       iex> GS1.Formatter.to_gs1(ds_with_serial)
       "]d2010987654321098710BATCH123\\x1D21SERIAL"
   """

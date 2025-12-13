@@ -108,7 +108,7 @@ defmodule GS1.AIRegistry do
       true
 
       iex> GS1.AIRegistry.compliant?("05")
-      true
+      false
   """
   @spec compliant?(String.t()) :: boolean()
   def compliant?(ai) when is_binary(ai) do

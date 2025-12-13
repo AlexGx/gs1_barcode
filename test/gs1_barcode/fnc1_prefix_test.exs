@@ -1,6 +1,8 @@
 defmodule GS1.FNC1PrefixTest do
   use ExUnit.Case, async: true
 
+  doctest GS1.FNC1Prefix
+
   alias GS1.Consts
   alias GS1.FNC1Prefix
 
