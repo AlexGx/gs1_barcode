@@ -116,6 +116,12 @@ defmodule GS1.CheckDigitTest do
       assert {:error, :empty} = CheckDigit.calculate("")
     end
 
+    test "returns error :invalid for wrong input" do
+      assert {:error, :invalid} = CheckDigit.calculate(0)
+      assert {:error, :invalid} = CheckDigit.calculate(nil)
+      assert {:error, :invalid} = CheckDigit.calculate(-1)
+    end
+
     test "returns error for non-digit characters" do
       assert {:error, :non_digit} = CheckDigit.calculate("123A5")
       assert {:error, :non_digit} = CheckDigit.calculate("12-34")
