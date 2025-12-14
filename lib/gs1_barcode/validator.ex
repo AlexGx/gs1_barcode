@@ -1,6 +1,8 @@
 defmodule GS1.Validator do
   @moduledoc """
   GS1 Data Structure validator.
+
+  Configurable validator for GS1 Data Structures with support of custom DSL constraints.
   """
 
   alias GS1.AIRegistry
@@ -10,8 +12,39 @@ defmodule GS1.Validator do
   alias GS1.ValidationError
   alias GS1.ValidatorConfig
 
+  @typedoc """
+  Result of a validation:
+  * `:ok` - signifies that Data Structure passed all validation checks.
+  * `{:invalid, errors}` - when one or more validation checks failed,
+  where `errors` is a list of accumulated `GS1.ValidationError.t()`.
+  """
   @type result :: :ok | {:invalid, [ValidationError.t()]}
 
+  @doc """
+  Validates a GS1 Data Structure against a given configuration.
+
+  The validation process is a pipeline of checks: required AIs, forbidden AIs,
+  check digits, dates for predefined set of AIs, and custom DSL constraints.
+
+  ## Examples
+      iex> ds = %GS1.DataStructure{
+      ...>  content: "01937123456789043103001234911A2B3C4D5E",
+      ...>  type: :unknown,
+      ...>  fnc1_prefix: "",
+      ...>  ais: %{"01" => "93712345678904", "3103" => "001234", "91" => "1A2B3C4D5E"}
+      ...> }
+      iex> GS1.Validator.validate(ds, GS1.ValidatorConfig.new(required_ais: ["01", "3103", "91"]))
+      :ok
+      iex> GS1.Validator.validate(ds, GS1.ValidatorConfig.new(forbidden_ais: ["3103"]))
+      {:invalid,
+        [
+          %GS1.ValidationError{
+            code: :forbidden_ai,
+            ai: "3103",
+            message: ~s(Forbidden AIs found: "3103")
+          }
+        ]}
+  """
   @spec validate(DataStructure.t(), ValidatorConfig.t()) :: result()
   def validate(%DataStructure{} = ds, %ValidatorConfig{} = config) do
     errors =
