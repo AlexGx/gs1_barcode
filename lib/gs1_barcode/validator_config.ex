@@ -80,8 +80,8 @@ defmodule GS1.ValidatorConfig do
 
   ## Examples
 
-      validator_config
-      |> put_constraint("01", fn val -> String.length(val) == 14 end)
+      iex> GS1.ValidatorConfig.new()
+      ...> |> GS1.ValidatorConfig.put_constraint("01", fn val -> String.length(val) == 14 end)
   """
   @spec put_constraint(t(), String.t(), Constraint.predicate()) :: t()
   def put_constraint(%__MODULE__{} = config, ai, fun) when is_binary(ai) and is_function(fun, 1),

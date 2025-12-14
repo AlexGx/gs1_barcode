@@ -32,17 +32,28 @@ defmodule GS1.Parser do
 
   ## Errors
 
-  The following error tuples may be returned:
+    The following error tuples may be returned:
 
-  * `:empty` - input string is empty.
-  * `:invalid_input` - input is not a binary string.
-  * `{:tokenize, reason, invalid_seq_start}` - string structure is invalid or malformed.
-    An `invalid_seq_start` is an index of bad sequence in input string.
-  * `{:unknown_ai, {ai, data}}` - AI is not recognized
-  * `{:duplicate_ai, {ai, data}}` - same AI appears twice
-  * `{:not_enough_data, {ai, data}}` - string ends prematurely for a AI.
-  * `{:ai_part_non_num, {ai, data}}` - expected digits for an AI suffix during reconstruction,
-    but found other characters.
+    * `:empty` - input string is empty.
+    * `:invalid_input` - input is not a binary string.
+    * `{:tokenize, reason, invalid_seq_start}` - string structure is invalid or malformed.
+        An `invalid_seq_start` is an index of bad sequence in input string.
+    * `{:unknown_ai, {ai, data}}` - AI is not recognized
+    * `{:duplicate_ai, {ai, data}}` - same AI appears twice
+    * `{:not_enough_data, {ai, data}}` - string ends prematurely for a AI.
+    * `{:ai_part_non_num, {ai, data}}` - expected digits for an AI suffix during reconstruction,
+        but found other characters.
+
+  ## Examples
+
+      iex> GS1.Parser.parse("]d20198765432109876")
+      {:ok,
+        %GS1.DataStructure{
+          content: "]d20198765432109876",
+          type: :gs1_datamatrix,
+          fnc1_prefix: "]d2",
+          ais: %{"01" => "98765432109876"}
+        }}
   """
   @spec parse(String.t()) :: {:ok, DataStructure.t()} | {:error, error_reason()}
   def parse(<<>>), do: {:error, :empty}

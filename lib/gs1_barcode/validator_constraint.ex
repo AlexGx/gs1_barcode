@@ -88,6 +88,12 @@ defmodule GS1.Validator.Constraint do
     end
   end
 
+  defmacro format(:date_yymmd0) do
+    quote do
+      fn v -> DateUtils.valid?(:yymmd0, v) end
+    end
+  end
+
   # Combinators
 
   @doc "Inverts the result of a predicate."

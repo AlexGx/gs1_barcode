@@ -1,7 +1,7 @@
 defmodule GS1.ParserTest do
   use ExUnit.Case, async: true
 
-  doctest GS1.DataStructure
+  doctest GS1.Parser
 
   alias GS1.DataStructure
   alias GS1.Parser

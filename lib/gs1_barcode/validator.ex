@@ -30,7 +30,7 @@ defmodule GS1.Validator do
 
   # Private section
 
-  # required
+  # required routine
 
   # no `fail_fast` because it is first in chain
   # defp check_required([_ | _] = errors, _ds, %ValidatorConfig{fail_fast: true}), do: errors
@@ -50,7 +50,7 @@ defmodule GS1.Validator do
     end)
   end
 
-  # forbidden
+  # forbidden routine
 
   defp check_forbidden([_ | _] = errors, _ds, %ValidatorConfig{fail_fast: true}), do: errors
 
@@ -70,7 +70,7 @@ defmodule GS1.Validator do
     end)
   end
 
-  # check digit
+  # check digit routine
 
   defp check_digits([_ | _] = errors, _ds, %ValidatorConfig{fail_fast: true}), do: errors
 
@@ -94,7 +94,7 @@ defmodule GS1.Validator do
     end)
   end
 
-  # check date
+  # check date routine
 
   defp check_dates([_ | _] = errors, _ds, %ValidatorConfig{fail_fast: true}), do: errors
 
@@ -103,7 +103,7 @@ defmodule GS1.Validator do
     dates = Enum.filter(AIRegistry.ai_date_yymmdd(), &(&1 in present_ais))
 
     Enum.reduce(dates, errors, fn date_ai, acc ->
-      if DateUtils.valid?(:yymmdd, ds.ais[date_ai]) do
+      if DateUtils.valid?(:yymmd0, ds.ais[date_ai]) do
         acc
       else
         [
@@ -118,7 +118,7 @@ defmodule GS1.Validator do
     end)
   end
 
-  # constraints
+  # constraints routine
 
   defp check_constraints([_ | _] = errors, _ds, %ValidatorConfig{fail_fast: true}),
     do: errors
