@@ -62,6 +62,11 @@ defmodule GS1.CompanyPrefixTest do
       # 590 is Poland, not a special range
       assert CompanyPrefix.range(590) == nil
     end
+
+    test "returns nil for invalid range input" do
+      assert CompanyPrefix.range("981") == nil
+      assert CompanyPrefix.range(nil) == nil
+    end
   end
 
   describe "range8/1 (GTIN-8)" do
@@ -70,6 +75,11 @@ defmodule GS1.CompanyPrefixTest do
       assert :rcn == CompanyPrefix.range8(0)
       assert :rcn == CompanyPrefix.range8(10)
       assert :rcn == CompanyPrefix.range8(99)
+    end
+
+    test "returns nil for invalid range8 input" do
+      assert CompanyPrefix.range8("952") == nil
+      assert CompanyPrefix.range8(nil) == nil
     end
 
     test "distinguishes between GTIN-8 and Standard logic" do
@@ -82,6 +92,14 @@ defmodule GS1.CompanyPrefixTest do
       # Prefix 040: in both systems, this is RCN.
       assert :rcn == CompanyPrefix.range(40)
       assert :rcn == CompanyPrefix.range8(40)
+    end
+
+    test "single item defined range8 test" do
+      assert :demo == CompanyPrefix.range8(952)
+    end
+
+    test "lookup undefined in range8" do
+       assert nil == CompanyPrefix.range8(953)
     end
   end
 end
