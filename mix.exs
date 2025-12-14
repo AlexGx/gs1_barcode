@@ -58,7 +58,7 @@ defmodule GS1Barcode.MixProject do
   defp aliases do
     [
       lint: ["format", "dialyzer"],
-      "cover.html": ["cmd MIX_ENV=test mix coveralls", "cmd open cover/excoveralls.html"]
+      "cover.html": ["cmd MIX_ENV=test mix coveralls.html", "cmd open cover/excoveralls.html"]
     ]
   end
 

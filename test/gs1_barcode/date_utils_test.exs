@@ -60,18 +60,15 @@ defmodule GS1.DateUtilsTest do
 
   describe "to_date/2 with :yymmdd format" do
     test "successfully converts a valid date string to a Date.t()" do
-      expected_date = ~D[2025-12-31]
-      assert DateUtils.to_date(:yymmdd, "251231") == {:ok, expected_date}
+      assert DateUtils.to_date(:yymmdd, "251231") == {:ok, ~D[2025-12-31]}
     end
 
     test "handles the 2000 boundary correctly" do
-      expected_date = ~D[2000-01-01]
-      assert DateUtils.to_date(:yymmdd, "000101") == {:ok, expected_date}
+      assert DateUtils.to_date(:yymmdd, "000101") == {:ok, ~D[2000-01-01]}
     end
 
     test "converts a valid leap day (2024-02-29)" do
-      expected_date = ~D[2024-02-29]
-      assert DateUtils.to_date(:yymmdd, "240229") == {:ok, expected_date}
+      assert DateUtils.to_date(:yymmdd, "240229") == {:ok, ~D[2024-02-29]}
     end
 
     test "returns error for an invalid calendar date (e.g., February 30th)" do
@@ -91,8 +88,31 @@ defmodule GS1.DateUtilsTest do
     end
   end
 
-  test "to_date/2 with :yymmd0 format behaves as an alias for :yymmdd" do
-    assert DateUtils.to_date(:yymmd0, "251231") == {:ok, ~D[2025-12-31]}
-    assert DateUtils.to_date(:yymmd0, "250230") == {:error, :invalid_date}
+  describe "to_date/2 with :yymmd0 format" do
+    test "to_date/2 with :yymmd0 acts same as :yymmdd for non-zeroed DD" do
+      assert DateUtils.to_date(:yymmdd, "240229") == DateUtils.to_date(:yymmd0, "240229")
+      assert DateUtils.to_date(:yymmdd, "2512310") == DateUtils.to_date(:yymmd0, "2512310")
+      assert DateUtils.to_date(:yymmdd, "161601") == DateUtils.to_date(:yymmd0, "161601")
+    end
+
+    test "to_date/2 with :yymmd0 format behaves as an alias for :yymmdd" do
+      assert DateUtils.to_date(:yymmd0, "251231") == {:ok, ~D[2025-12-31]}
+      assert DateUtils.to_date(:yymmd0, "250230") == {:error, :invalid_date}
+    end
+
+    test ":yymmd0 test cases from genspec" do
+      assert DateUtils.to_date(:yymmd0, "130200") == {:ok, ~D[2013-02-28]}
+      assert DateUtils.to_date(:yymmd0, "160200") == {:ok, ~D[2016-02-29]}
+    end
+
+    test "returns error for non-date string that matches length" do
+      assert DateUtils.to_date(:yymmd0, "AABBCC") == {:error, :invalid_format}
+    end
+
+    test "more tests for coverage" do
+      assert DateUtils.to_date(:yymmd0, "A10200") == {:error, :invalid_format}
+      assert DateUtils.to_date(:yymmd0, "22A200") == {:error, :invalid_format}
+      assert DateUtils.to_date(:yymmd0, "221300") == {:error, :invalid_date}
+    end
   end
 end
