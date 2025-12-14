@@ -91,7 +91,7 @@ defmodule GS1.AIRegistry do
   ]
 
   @doc """
-  Returns a list of AIs whose data field represents a date in `YYMMDD` format.
+  Returns a list of AIs whose data field is a date in `YYMMDD` format.
   """
   @spec ai_date_yymmdd :: list(String.t())
   def ai_date_yymmdd, do: @ai_date_yymmdd
