@@ -17,7 +17,7 @@ defmodule GS1.Code do
           | :gtin14
           | :sscc
 
-  @type detect_error :: :invalid_length | :invalid_input | :invalid_checksum
+  @type detect_error :: :invalid_length | :invalid_input | :invalid_digit_or_checksum
 
   @type normalize_error :: :cannot_normalize | :sscc_has_no_product_id
 
@@ -305,7 +305,7 @@ defmodule GS1.Code do
     if CheckDigit.valid?(code) do
       {:ok, type}
     else
-      {:error, :invalid_checksum}
+      {:error, :invalid_digit_or_checksum}
     end
   end
 

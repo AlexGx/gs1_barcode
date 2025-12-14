@@ -41,8 +41,16 @@ defmodule GS1.CheckDigit do
 
       iex> GS1.CheckDigit.calculate("ABC")
       {:error, :non_digit}
+
+      iex> GS1.CheckDigit.calculate(5762654)
+      {:ok, 3}
   """
-  @spec calculate(String.t()) :: {:ok, non_neg_integer()} | {:error, term()}
+  @spec calculate(String.t() | pos_integer()) :: {:ok, non_neg_integer()} | {:error, term()}
+
+  def calculate(code) when is_integer(code) and code > 0 do
+    calculate(code |> Integer.to_string())
+  end
+
   def calculate(code) when is_binary(code) do
     case byte_size(code) do
       0 ->
@@ -56,6 +64,8 @@ defmodule GS1.CheckDigit do
     end
   end
 
+  def calculate(_), do: {:error, :invalid}
+
   # Private section
 
   defp sum_digits(<<>>, _weight, sum), do: {:ok, sum}
@@ -63,6 +73,7 @@ defmodule GS1.CheckDigit do
   # ?0 is the ASCII int for '0', subtract it to get the real value.
   defp sum_digits(<<char, rest::binary>>, weight, sum) when char >= ?0 and char <= ?9 do
     digit = char - ?0
+
     new_sum = sum + digit * weight
 
     # toggle weight

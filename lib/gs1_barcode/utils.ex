@@ -79,18 +79,18 @@ defmodule GS1.Utils do
   @doc """
   Converts a 20-char data string (e.g., AI "8200") to WGS84 lat, lon coords.
 
-  Input is split into two 10-character parts:
+  Input is split into two 10-char parts:
   * First 10 characters encode **latitude** (X).
   * Second 10 characters encode **longitude** (Y).
 
   The conversion logic is defined by GS1 specifications for location encoding.
 
   ## Parameters
-  * `data`: A 20-character binary/string containing the encoded coordinates.
+  * `data`: A 20-char binary/string containing the encoded coordinates.
 
   ## Returns
   * `{:ok, {latitude, longitude}}`  - where both are floats.
-  * `{:error, :invalid}` -  if the input is not a 20-character binary or parts are invalid.
+  * `{:error, :invalid}` -  if the input is not a 20-char binary or parts are invalid.
 
   ## Examples
 
@@ -124,7 +124,7 @@ defmodule GS1.Utils do
   Converts WGS84 lan, lon coords to 20-char GS1 encoded string.
 
   The resulting string is formatted as a 10-digit encoded latitude followed by a 10-digit encoded longitude.
-  Each encoded integer is padded with leading zeros to ensure a 10-character length.
+  Each encoded integer is padded with leading zeros to ensure a 10-char length.
   This is the reverse operation of `string_20_to_wgs84_lat_log/1`.
 
   ## Parameters

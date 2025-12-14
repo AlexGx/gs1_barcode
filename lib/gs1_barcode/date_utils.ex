@@ -11,7 +11,7 @@ defmodule GS1.DateUtils do
   @type date_format :: :yymmdd | :yymmd0
 
   @doc """
-  Checks if a 6-character string is a valid date in the GS1 `YYMMDD` format.
+  Checks if a 6-char string is a valid date in the GS1 `YYMMDD` format.
 
   ## Examples
 
@@ -47,7 +47,7 @@ defmodule GS1.DateUtils do
   def valid?(:yymmdd, _), do: false
 
   @doc """
-  Converts a 6-character GS1 date string (`YYMMDD`) into an Elixir `Date.t()`.
+  Converts a 6-char GS1 date string (`YYMMDD`) into a `Date.t()`.
 
   ## Examples
 

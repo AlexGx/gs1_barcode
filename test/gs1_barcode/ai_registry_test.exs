@@ -123,11 +123,11 @@ defmodule GS1.AIRegistryTest do
       assert AIRegistry.extended_ai_range_lookup("8111") == {8110, 8112}
     end
 
-    test "returns nil for 3-character keys not in registry" do
+    test "returns nil for 3-char keys not in registry" do
       assert AIRegistry.extended_ai_range_lookup("999") == nil
     end
 
-    test "lookups ranges for 2-character keys" do
+    test "lookups ranges for 2-char keys" do
       assert AIRegistry.extended_ai_range_lookup("235") == {235, 235}
       assert AIRegistry.extended_ai_range_lookup("241") == {240, 243}
       assert AIRegistry.extended_ai_range_lookup("416") == {410, 417}

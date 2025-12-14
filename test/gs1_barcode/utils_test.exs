@@ -1,14 +1,14 @@
 defmodule GS1.UtilsTest do
   use ExUnit.Case, async: true
 
-  doctest  GS1.Utils
+  doctest GS1.Utils
 
   alias GS1.Utils
 
-
   describe "valid_gln?/1" do
     test "returns true for a string that Code.detect/1 identifies as :gtin13" do
-      gln_candidate = "4006381333931" # A real GTIN-13 structure
+      # A real GTIN-13 structure
+      gln_candidate = "4006381333931"
       assert Utils.valid_gln?(gln_candidate) == true
     end
 
@@ -32,7 +32,7 @@ defmodule GS1.UtilsTest do
     end
 
     test "converts data with zero decimal places correctly" do
-      assert Utils.data_to_float("12345", 0) == {:ok, 12345.0}
+      assert Utils.data_to_float("12345", 0) == {:ok, 12_345.0}
       assert Utils.data_to_float("0", 0) == {:ok, 0.0}
     end
 
@@ -59,7 +59,7 @@ defmodule GS1.UtilsTest do
     end
 
     test "returns :invalid for non-string data" do
-      assert Utils.data_to_float(12345, 2) == {:error, :invalid}
+      assert Utils.data_to_float(12_345, 2) == {:error, :invalid}
       assert Utils.data_to_float(nil, 2) == {:error, :invalid}
       assert Utils.data_to_float("12345", :two) == {:error, :invalid}
     end
@@ -104,7 +104,7 @@ defmodule GS1.UtilsTest do
       assert Utils.string_20_to_wgs84_lat_log("123456789a1234567890") == {:error, :invalid}
       assert Utils.string_20_to_wgs84_lat_log("1234567890123456789!") == {:error, :invalid}
       # non-string input
-      assert Utils.string_20_to_wgs84_lat_log(12345) == {:error, :invalid}
+      assert Utils.string_20_to_wgs84_lat_log(12_345) == {:error, :invalid}
     end
 
     test "wgs84_lat_log_to_string_20/2 handles out-of-range coordinates" do
@@ -125,12 +125,14 @@ defmodule GS1.UtilsTest do
   describe "Coordinate Helper Functions" do
     @lat_ref -62.0914152
     @lon_ref -58.470202900000004
-    @x_ref 279085848 # encoded Latitude
-    @y_ref 3015297971 # encoded Longitude
+    # encoded Latitude
+    @x_ref 279_085_848
+    # encoded Longitude
+    @y_ref 3_015_297_971
 
     test "wgs84_lat_log_to_ints/2 converts float coords to encoded integers" do
       assert Utils.wgs84_lat_log_to_ints(@lat_ref, @lon_ref) == {:ok, {@x_ref, @y_ref}}
-      assert Utils.wgs84_lat_log_to_ints(90.0, 0.0) == {:ok, {1800000000, 3599999640}}
+      assert Utils.wgs84_lat_log_to_ints(90.0, 0.0) == {:ok, {1_800_000_000, 3_599_999_640}}
     end
 
     test "to_wgs84_latitude_deg/1 converts encoded latitude back to degrees" do
@@ -139,7 +141,7 @@ defmodule GS1.UtilsTest do
       # 0 (South Pole)
       assert Utils.to_wgs84_latitude_deg(0) == -90.0
       # 1800000000 (North Pole)
-      assert Utils.to_wgs84_latitude_deg(1800000000) == 90.0
+      assert Utils.to_wgs84_latitude_deg(1_800_000_000) == 90.0
       # non-integer input
       assert Utils.to_wgs84_latitude_deg(4.5) == nil
     end
@@ -148,8 +150,8 @@ defmodule GS1.UtilsTest do
       # reference value
       assert Utils.to_wgs84_longitude_deg(@y_ref) == @lon_ref
       assert Utils.to_wgs84_longitude_deg(0) == 0.0
-      assert Utils.to_wgs84_longitude_deg(1800000000) == -180.0
-      assert Utils.to_wgs84_longitude_deg(3600000000) == 0.0
+      assert Utils.to_wgs84_longitude_deg(1_800_000_000) == -180.0
+      assert Utils.to_wgs84_longitude_deg(3_600_000_000) == 0.0
       # Test with non-integer input
       assert Utils.to_wgs84_longitude_deg(4.5) == nil
     end

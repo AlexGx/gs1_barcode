@@ -51,12 +51,11 @@ defmodule GS1.CodeTest do
     end
 
     test "returns error for invalid checksum" do
-      assert {:error, :invalid_checksum} = Code.detect(@invalid_checksum)
+      assert {:error, :invalid_digit_or_checksum} = Code.detect(@invalid_checksum)
     end
 
     test "returns error when invalid char" do
-      # review
-      assert {:error, :invalid_checksum} == Code.detect(@invalid_char)
+      assert {:error, :invalid_digit_or_checksum} == Code.detect(@invalid_char)
     end
   end
 
