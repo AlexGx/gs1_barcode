@@ -48,7 +48,7 @@ defmodule GS1.Code do
   Normalizes valid GTIN-8 to a GTIN-12
   Returns error if the input is not a valid GTIN or cannot be normalized to this dimension.
 
-    ## Example
+    ## Examples
 
       iex> GS1.Code.to_gtin12("40052441")
       {:ok, "000040052441"}
@@ -163,7 +163,7 @@ defmodule GS1.Code do
   @doc """
   Returns payload (part without check digit) of valid code.
 
-  ## Example
+  ## Examples
 
       iex> GS1.Code.payload("4006381333931")
       {:ok, "400638133393"}
@@ -183,11 +183,10 @@ defmodule GS1.Code do
   Lookups country (MO) based on the code prefix.
   Returns `nil` non-country ranges and for GTIN-8 as they use a distinct prefix list.
 
-  ## Example
+  ## Examples
 
       iex> GS1.Code.country("4006381333931")
       [{"Germany", "DE", "DEU", "276"}]
-
   """
   @spec country(String.t()) :: CompanyPrefix.country_mo() | {:error, detect_error()}
   def country(code) do

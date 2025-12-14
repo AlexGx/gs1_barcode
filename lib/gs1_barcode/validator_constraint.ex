@@ -3,7 +3,7 @@ defmodule GS1.Validator.Constraint do
   A DSL for building reusable GS1 AI validation constraint predicates,
   that are intended to be lightweight and composable.
 
-  ## Example
+  ## Examples
 
       import GS1.Validator.Constraint
 

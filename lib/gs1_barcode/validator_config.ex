@@ -30,7 +30,7 @@ defmodule GS1.ValidatorConfig do
   @doc """
   Creates a new `GS1.ValidatorConfig` with optional default values.
 
-  ## Example
+  ## Examples
 
       iex> GS1.ValidatorConfig.new(fail_fast: false, required_ais: ["01", "21"])
       %GS1.ValidatorConfig{
@@ -78,7 +78,7 @@ defmodule GS1.ValidatorConfig do
   @doc """
   Adds a custom validation constraint for a specific AI.
 
-  ## Example
+  ## Examples
 
       validator_config
       |> put_constraint("01", fn val -> String.length(val) == 14 end)

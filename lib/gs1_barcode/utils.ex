@@ -1,5 +1,11 @@
 defmodule GS1.Utils do
-  @moduledoc false
+  @moduledoc """
+  Utility functions for:
+
+  * GLN validation
+  * Converting AI data with implied decimal points into floats.
+  * Converting between GS1 20-digit location strings and WGS84 lat/long coordinates and vise versa.
+  """
 
   alias GS1.Code
 
@@ -7,7 +13,7 @@ defmodule GS1.Utils do
   Validates if a code structure matches a GLN (Global Location Number).
   GLN is structurally identical to a GTIN-13 but relies on context.
 
-  ## Example
+  ## Examples
 
       iex> GS1.Utils.valid_gln?("4006381333931")
       true
@@ -21,7 +27,72 @@ defmodule GS1.Utils do
   end
 
   @doc """
-  ## Example
+  Converts a AIs (like "310x", "320x", etc.) data string, which may contain an
+  implied decimal point to float.
+
+  The `dec_places` parameter specifies how many digits from the right of the string
+  represent the fractional part. See genspec: 7.8.7 Application Identifiers with implied
+  decimal point positions
+
+  ## Parameters
+  * `data`: AI data part (e.g., `"3000200"`).
+  * `dec_places`: The number of digits after the implied decimal point (e.g., `3`).
+
+  ## Returns
+  * `{:ok, float()}` - if conversion is successful.
+  * `{:error, :invalid}` - if the resulting string cannot be parsed as a float.
+  * `{:error, :len_mismatch}` - if the length of `data` is less than or equal to `dec_places`.
+
+  ## Examples
+
+      iex> GS1.Utils.data_to_float("3000200", 3)
+      {:ok, 3000.2}
+  """
+  @spec data_to_float(String.t(), non_neg_integer()) ::
+          {:error, :invalid | :len_mismatch} | {:ok, float()}
+
+  def data_to_float(data, 0) when is_binary(data) do
+    case Float.parse(data) do
+      {float, ""} -> {:ok, float}
+      _ -> {:error, :invalid}
+    end
+  end
+
+  def data_to_float(data, dec_places)
+      when is_binary(data) and is_integer(dec_places) and dec_places > 0 do
+    len = String.length(data)
+
+    if len <= dec_places do
+      {:error, :len_mismatch}
+    else
+      {whole, frac} = String.split_at(data, -dec_places)
+
+      case Float.parse(whole <> "." <> frac) do
+        {float, ""} -> {:ok, float}
+        _ -> {:error, :invalid}
+      end
+    end
+  end
+
+  def data_to_float(_, _), do: {:error, :invalid}
+
+  @doc """
+  Converts a 20-char data string (e.g., AI "8200") to WGS84 lat, lon coords.
+
+  Input is split into two 10-character parts:
+  * First 10 characters encode **latitude** (X).
+  * Second 10 characters encode **longitude** (Y).
+
+  The conversion logic is defined by GS1 specifications for location encoding.
+
+  ## Parameters
+  * `data`: A 20-character binary/string containing the encoded coordinates.
+
+  ## Returns
+  * `{:ok, {latitude, longitude}}`  - where both are floats.
+  * `{:error, :invalid}` -  if the input is not a 20-character binary or parts are invalid.
+
+  ## Examples
 
       iex> GS1.Utils.string_20_to_wgs84_lat_log("02790858483015297971")
       {:ok, {-62.0914152, -58.470202900000004}}
@@ -50,10 +121,24 @@ defmodule GS1.Utils do
   def string_20_to_wgs84_lat_log(_), do: {:error, :invalid}
 
   @doc """
-  ## Example
+  Converts WGS84 lan, lon coords to 20-char GS1 encoded string.
+
+  The resulting string is formatted as a 10-digit encoded latitude followed by a 10-digit encoded longitude.
+  Each encoded integer is padded with leading zeros to ensure a 10-character length.
+  This is the reverse operation of `string_20_to_wgs84_lat_log/1`.
+
+  ## Parameters
+  * `lat_deg`: WGS84 latitude in decimal degrees ($-90.0$ to $90.0$).
+  * `lon_deg`: WGS84 longitude in decimal degrees ($-180.0$ to $180.0$).
+
+  ## Returns
+  * `{:ok, String.t()}` - 20-char encoded string.
+  * `{:error, :invalid_lat_lon}` - when input coords are outside the valid WGS84 range.
+
+  ## Examples
 
       iex> GS1.Utils.wgs84_lat_log_to_string_20(-62.0914152, -58.470202900000004)
-      "02790858483015297971"
+      {:ok, "02790858483015297971"}
   """
   @spec wgs84_lat_log_to_string_20(float(), float()) ::
           {:ok, String.t()} | {:error, :invalid_lat_lon}
@@ -70,7 +155,7 @@ defmodule GS1.Utils do
   end
 
   @doc """
-  ## Example
+  ## Examples
 
         iex> GS1.Utils.wgs84_lat_log_to_ints(-62.0914152, -58.470202900000004)
         {:ok, {279085848, 3015297971}}
@@ -94,7 +179,7 @@ defmodule GS1.Utils do
   def wgs84_lat_log_to_ints(_, _), do: {:error, :invalid_lat_lon}
 
   @doc """
-  ## Example
+  ## Examples
 
         iex> GS1.Utils.to_wgs84_latitude_deg(0279085848)
         -62.0914152
@@ -107,7 +192,7 @@ defmodule GS1.Utils do
   def to_wgs84_latitude_deg(_), do: nil
 
   @doc """
-  ## Example
+  ## Examples
 
         iex> GS1.Utils.to_wgs84_longitude_deg(3015297971)
         -58.470202900000004

@@ -2,7 +2,7 @@ defmodule GS1.Tokenizer do
   @moduledoc """
   Configured GS1 Tokenizer. See `GS1.Tokenizer.Base`.
 
-  ## Example
+  ## Examples
 
       iex> GS1.Tokenizer.tokenize("010460049469420217210228")
       {:ok, [

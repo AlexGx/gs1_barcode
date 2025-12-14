@@ -208,11 +208,10 @@ defmodule GS1.CompanyPrefix do
   @doc """
   Lookups GS1 Country (MO) by int prefix.
 
-  ## Example
+  ## Examples
 
       iex> GS1.CompanyPrefix.country(590)
       [{"Poland", "PL", "POL", "616"}]
-
   """
   @spec country(pos_integer()) :: country_mo()
   def country(p) when is_integer(p), do: lookup_mo(p)
@@ -223,11 +222,10 @@ defmodule GS1.CompanyPrefix do
   Lookups GS1 range by int prefix.
   Used for **non-GTIN-8** codes.
 
-  ## Example
+  ## Examples
 
       iex> GS1.CompanyPrefix.range(200)
       :rcn
-
   """
   @spec range(non_neg_integer()) :: range_type()
   def range(p) when is_integer(p), do: lookup_range(p)
@@ -239,11 +237,10 @@ defmodule GS1.CompanyPrefix do
   Used for **GTIN-8** codes.
   GTIN-8 has different allocation ranges GTIN-13.
 
-  ## Example
+  ## Examples
 
       iex> GS1.CompanyPrefix.range8(001)
       :rcn
-
   """
   @spec range8(non_neg_integer()) :: nil | :rcn | :demo
   def range8(p) when is_integer(p), do: lookup_range8(p)

@@ -6,7 +6,7 @@ defmodule GS1.CheckDigit do
   @doc """
   Validates a digit-only binary string.
 
-  ## Example
+  ## Examples
 
       iex> GS1.CheckDigit.valid?("012345678905")
       true
