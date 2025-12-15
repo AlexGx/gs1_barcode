@@ -366,4 +366,36 @@ defmodule GS1.CodeTest do
       assert {:error, :invalid} = Code.create_sscc("1", "123", "1")
     end
   end
+
+  describe "to_key/1" do
+    test "correctly converts GTIN-14 to base integer (strips PLI and check digit)" do
+      # GTIN-14: "1" (PLI) + "123456789012" (base) + "5" (check Digit)
+      assert Code.to_key("11234567890125") == {:ok, 123_456_789_012}
+
+      # leading zeros in base number should be preserved as int value
+      # "9" (PLI) + "000000000001" (base) + "9" (check digit) -> 1
+      assert Code.to_key("90000000000010") == {:ok, 1}
+    end
+
+    test "correctly converts GTIN-13 to base integer (strips check digit)" do
+      # GTIN-13: "123456789012" (base) + "8" (check digit)
+      assert Code.to_key("1234567890128") == {:ok, 123_456_789_012}
+    end
+
+    test "correctly converts GTIN-8 to base integer (strips check digit)" do
+      # GTIN-8: "1234567" (base) + "0" (check digit)
+      assert Code.to_key("12345670") == {:ok, 1_234_567}
+    end
+
+    test "returns error for SSCC codes" do
+      assert Code.to_key(@sscc) == {:error, :invalid_key_type}
+    end
+
+    test "propagates detection errors for invalid codes" do
+      # smoke `detect/1` returns these errors for invalid inputs
+      assert Code.to_key("123") == {:error, :invalid_length}
+      assert Code.to_key("ABC") == {:error, :invalid_length}
+      assert Code.to_key("") == {:error, :invalid_length}
+    end
+  end
 end
