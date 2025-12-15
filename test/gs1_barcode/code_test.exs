@@ -59,6 +59,92 @@ defmodule GS1.CodeTest do
     end
   end
 
+  describe "generate/2" do
+    test "generates valid GTIN-8" do
+      # 1234567 -> check digit 0 -> 12345670
+      assert {:ok, "12345670"} = Code.generate(:gtin8, 1_234_567)
+
+      # Padding check: 5 -> 0000005 -> check digit ?
+      {:ok, result} = Code.generate(:gtin8, 5)
+      assert String.length(result) == 8
+      assert String.starts_with?(result, "0000005")
+    end
+
+    test "generates valid GTIN-12" do
+      # 12345678901 -> check digit 2 -> 123456789012
+      assert {:ok, "123456789012"} = Code.generate(:gtin12, 12_345_678_901)
+
+      # Padding check
+      {:ok, result} = Code.generate(:gtin12, 99)
+      assert String.length(result) == 12
+      assert String.starts_with?(result, "00000000099")
+    end
+
+    test "generates valid GTIN-13" do
+      # 200000000034 -> check digit 3 -> 2000000000343
+      assert {:ok, "2000000000343"} = Code.generate(:gtin13, 200_000_000_034)
+
+      # Padding check
+      {:ok, result} = Code.generate(:gtin13, 123)
+      assert String.length(result) == 13
+      assert String.starts_with?(result, "000000000123")
+    end
+
+    test "returns specific error for GTIN-14" do
+      assert {:error, :use_to_gtin14} = Code.generate(:gtin14, 123)
+    end
+
+    test "returns specific error for SSCC" do
+      assert {:error, :use_create_sscc} = Code.generate(:sscc, 123)
+    end
+
+    test "returns error for invalid code type" do
+      assert {:error, :invalid_type} = Code.generate(:isbn, 123)
+      assert {:error, :invalid_type} = Code.generate(:unknown, 123)
+    end
+
+    test "returns error when key is out of bounds" do
+      # GTIN-8 limit is 10_000_000 (7 digits)
+      assert {:error, :key_out_of_bounds} = Code.generate(:gtin8, 10_000_000)
+
+      # GTIN-12 limit is 100_000_000_000 (11 digits)
+      assert {:error, :key_out_of_bounds} = Code.generate(:gtin12, 100_000_000_000)
+
+      # GTIN-13 limit is 1_000_000_000_000 (12 digits)
+      assert {:error, :key_out_of_bounds} = Code.generate(:gtin13, 1_000_000_000_000)
+    end
+
+    test "returns error when key is invalid (negative or zero)" do
+      assert {:error, :key_out_of_bounds} = Code.generate(:gtin13, 0)
+      assert {:error, :key_out_of_bounds} = Code.generate(:gtin13, -5)
+    end
+
+    test "returns error when key is not an integer" do
+      assert {:error, :invalid_key} = Code.generate(:gtin13, "123")
+      assert {:error, :invalid_key} = Code.generate(:gtin13, 12.5)
+    end
+  end
+
+  describe "generate!/2" do
+    test "returns string on success" do
+      assert "2000000000343" == Code.generate!(:gtin13, 200_000_000_034)
+    end
+
+    test "raises ArgumentError on failure" do
+      assert_raise ArgumentError, "use_to_gtin14", fn ->
+        Code.generate!(:gtin14, 123)
+      end
+
+      assert_raise ArgumentError, "key_out_of_bounds", fn ->
+        Code.generate!(:gtin8, 99_999_999)
+      end
+
+      assert_raise ArgumentError, "invalid_type", fn ->
+        Code.generate!(:unknown, 123)
+      end
+    end
+  end
+
   describe "to_gtin12/1" do
     test "pads valid GTIN-8 to 12 digits" do
       # 40052441 -> 000040052441
@@ -222,6 +308,62 @@ defmodule GS1.CodeTest do
 
     test "range/1 GTIN-8 tests" do
       assert nil == Code.range(@gtin8)
+    end
+  end
+
+  describe "create_sscc/3" do
+    test "generates valid SSCC with integer extension digit" do
+      assert {:ok, "140063810000123454"} = Code.create_sscc(1, "4006381", "12345")
+    end
+
+    test "test when non digit passed in gcp or serial" do
+      assert {:error, :invalid} == Code.create_sscc(1, "4006381a", "12345")
+      assert {:error, :invalid} == Code.create_sscc(1, "4006381", "a2345")
+    end
+
+    test "generates valid SSCC with char extension digit" do
+      assert {:ok, "040063810000123457"} = Code.create_sscc(?0, "4006381", "12345")
+    end
+
+    test "pads serial number with leading zeros correctly" do
+      # GCP: 123 (3 chars), Serial: 1 (1 char)
+      # available: 13 chars. Padded: 0000000000001
+      {:ok, sscc} = Code.create_sscc(0, "123", "1")
+      assert String.length(sscc) == 18
+      # 0 (ext) + 123 (gcp) + 0000000000001 (serial) + check
+      assert String.starts_with?(sscc, "01230000000000001")
+    end
+
+    test "handles serial number that fits exactly without padding" do
+      # GCP: 123456 (6 chars). Available: 10 chars.
+      # Serial: 1234567890 (10 chars).
+      {:ok, sscc} = Code.create_sscc(3, "123456", "1234567890")
+      assert String.length(sscc) == 18
+      assert String.starts_with?(sscc, "31234561234567890")
+    end
+
+    test "returns error when serial number is too long for the GCP" do
+      # GCP: 1234567890123456 (16 chars). Available: 0 chars.
+      assert {:error, :gcp_or_serial_too_long} = Code.create_sscc(1, "1234567890123456", "1")
+
+      # GCP: 123 (3 chars). Available: 13 chars. Serial: 14 chars.
+      long_serial = String.duplicate("1", 14)
+      assert {:error, :gcp_or_serial_too_long} = Code.create_sscc(1, "123", long_serial)
+    end
+
+    test "returns error for invalid extension digit" do
+      assert {:error, :invalid} = Code.create_sscc(10, "123", "1")
+      assert {:error, :invalid} = Code.create_sscc(-1, "123", "1")
+      assert {:error, :invalid} = Code.create_sscc(?a, "123", "1")
+    end
+
+    test "returns error for invalid input types" do
+      # GCP not binary
+      assert {:error, :invalid} = Code.create_sscc(1, 123, "1")
+      # Serial not binary
+      assert {:error, :invalid} = Code.create_sscc(1, "123", 1)
+      # ext not int/char
+      assert {:error, :invalid} = Code.create_sscc("1", "123", "1")
     end
   end
 end

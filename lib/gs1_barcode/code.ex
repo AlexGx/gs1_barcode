@@ -100,9 +100,9 @@ defmodule GS1.Code do
 
   def generate(:sscc, _key), do: {:error, :use_create_sscc}
 
-  def generate(_, key) when is_integer(key), do: {:error, :key_out_of_bounds}
-
   def generate(code_type, _) when code_type not in @code_types, do: {:error, :invalid_type}
+
+  def generate(_, key) when is_integer(key), do: {:error, :key_out_of_bounds}
 
   def generate(_, _), do: {:error, :invalid_key}
 
@@ -242,17 +242,58 @@ defmodule GS1.Code do
 
   def to_gtin14(_, _), do: {:error, :invalid_pli}
 
-  def create_sscc(ext, company_prefix, serial) when ext >= ?0 and ext <= ?9 do
-    create_sscc(ext - ?0, company_prefix, serial)
+  @doc """
+  Generates a valid SSCC (Serial Shipping Container Code) from the Extension Digit,
+  GS1 Company Prefix (GCP), and Serial Reference.
+
+  SSCC is an 18-digit number used to identify logistics units, with structure:
+  1. **Extension Digit:** 1 digit (0-9).
+  2. **GS1 Company Prefix:** variable length.
+  3. **Serial Reference:** variable length (padded with leading zeros if needed).
+  4. **Check Digit:** 1 digit.
+
+  Function ensures that the combined length of GCP and Serial doesn't exceeds 16 digits,
+  and returns an error if the provided `serial` is too long to fit within the remaining
+  space allowed by the GCP.
+
+  ## Examples
+
+      iex> GS1.Code.create_sscc(1, "4006381", "12345")
+      {:ok, "140063810000123454"}
+
+      # Accepts Extension Digit as char or integer
+      iex> GS1.Code.create_sscc(?0, "4006381", "12345")
+      {:ok, "040063810000123457"}
+
+      iex> GS1.Code.create_sscc(1, "1234567890123456", "1")
+      {:error, :gcp_or_serial_too_long}
+  """
+  @spec create_sscc(non_neg_integer() | char(), binary(), binary()) ::
+          {:error, :gcp_or_serial_too_long | :invalid} | {:ok, String.t()}
+  def create_sscc(ext, gcp, serial) when ext >= ?0 and ext <= ?9 do
+    create_sscc(ext - ?0, gcp, serial)
   end
 
-  def create_sscc(ext, _company_prefix, _serial) when ext in 0..9 do
-    # ext 0 - 9
-    # `company_prefix` + `serial` must be total len = 16
-    # `serial` must be padded with zeros if needed
-    # check_digit at end
-    raise "Not implemented."
+  def create_sscc(ext, gcp, serial)
+      when ext in 0..9 and is_binary(gcp) and
+             is_binary(serial) do
+    gcp_len = byte_size(gcp)
+    serial_len = byte_size(serial)
+    serial_max_len = 16 - gcp_len
+
+    if serial_len > serial_max_len do
+      {:error, :gcp_or_serial_too_long}
+    else
+      payload = to_string(ext) <> gcp <> String.pad_leading(serial, serial_max_len, "0")
+
+      case CheckDigit.calculate(payload) do
+        {:ok, check} -> {:ok, payload <> to_string(check)}
+        {:error, _} -> {:error, :invalid}
+      end
+    end
   end
+
+  def create_sscc(_ext, _gcp, _serial), do: {:error, :invalid}
 
   @doc """
   Returns payload (part without check digit) of valid code.
