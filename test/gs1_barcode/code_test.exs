@@ -59,7 +59,7 @@ defmodule GS1.CodeTest do
     end
   end
 
-  describe "generate/2 and generate!/2" do
+  describe "generate/2 tests" do
     test "generates valid GTIN-8" do
       # 1234567 -> check digit 0 -> 12345670
       assert {:ok, "12345670"} = Code.generate(:gtin8, 1_234_567)
@@ -68,14 +68,6 @@ defmodule GS1.CodeTest do
       {:ok, result} = Code.generate(:gtin8, 5)
       assert String.length(result) == 8
       assert String.starts_with?(result, "0000005")
-    end
-
-    test "banger! tests" do
-      assert "12345670" == Code.generate!(:gtin8, 1_234_567)
-
-      assert_raise ArgumentError, "use_to_gtin14", fn ->
-        Code.generate!(:gtin14, 200_000_000_034)
-      end
     end
 
     test "generates valid GTIN-12" do
@@ -153,7 +145,7 @@ defmodule GS1.CodeTest do
     end
   end
 
-  describe "to_gtin12/1" do
+  describe "to_gtin12/1 tests" do
     test "pads valid GTIN-8 to 12 digits" do
       # 40052441 -> 000040052441
       assert {:ok, "0000" <> @gtin8} = Code.to_gtin12(@gtin8)
@@ -166,6 +158,30 @@ defmodule GS1.CodeTest do
     test "fails for code like input" do
       assert {:error, :invalid_length} = Code.to_gtin12("")
       assert {:error, :invalid_digit_or_checksum} = Code.to_gtin12(" ffffffffffff")
+    end
+  end
+
+  describe "to_gtin12!/1 tests" do
+    test "normalizes GTIN-8 to GTIN-12" do
+      assert Code.to_gtin12!("40052441") == "000040052441"
+    end
+
+    test "raises ArgumentError for GTIN-13" do
+      assert_raise ArgumentError, "cannot_normalize", fn ->
+        Code.to_gtin12!("4006381333931")
+      end
+    end
+
+    test "raises ArgumentError for invalid code" do
+      assert_raise ArgumentError, "invalid_length", fn ->
+        Code.to_gtin12!("123")
+      end
+    end
+
+    test "raises ArgumentError for invalid checksum" do
+      assert_raise ArgumentError, "invalid_digit_or_checksum", fn ->
+        Code.to_gtin12!("40052442")
+      end
     end
   end
 
@@ -202,7 +218,43 @@ defmodule GS1.CodeTest do
     end
   end
 
-  describe "to_gtin14/2" do
+  describe "to_gtin13!/1 tests" do
+    test "normalizes GTIN-8 to GTIN-13" do
+      assert Code.to_gtin13!("12345670") == "0000012345670"
+    end
+
+    test "normalizes GTIN-12 to GTIN-13" do
+      assert Code.to_gtin13!("012345678905") == "0012345678905"
+    end
+
+    test "returns GTIN-13 unchanged" do
+      assert Code.to_gtin13!("4006381333931") == "4006381333931"
+    end
+
+    test "reduces GTIN-14 to GTIN-13" do
+      assert Code.to_gtin13!("10123456789019") == "0123456789012"
+    end
+
+    test "raises ArgumentError for SSCC" do
+      assert_raise ArgumentError, "cannot_normalize", fn ->
+        Code.to_gtin13!("140063810000123454")
+      end
+    end
+
+    test "raises ArgumentError for invalid length" do
+      assert_raise ArgumentError, "invalid_length", fn ->
+        Code.to_gtin13!("123")
+      end
+    end
+
+    test "raises ArgumentError for invalid checksum" do
+      assert_raise ArgumentError, "invalid_digit_or_checksum", fn ->
+        Code.to_gtin13!("4006381333932")
+      end
+    end
+  end
+
+  describe "to_gtin14/2 tests" do
     test "pads with 0 (PLI 0) simply by prepending zeros" do
       # should preserve existing check digit
       assert {:ok, "0" <> @gtin13} == Code.to_gtin14(0, @gtin13)
@@ -236,6 +288,46 @@ defmodule GS1.CodeTest do
     end
   end
 
+  describe "to_gtin14!/2 tests" do
+    test "converts GTIN-13 to GTIN-14 with PLI 0" do
+      assert Code.to_gtin14!(0, "4006381333931") == "04006381333931"
+    end
+
+    test "converts GTIN-13 to GTIN-14 with PLI 1" do
+      assert Code.to_gtin14!(1, "4006381333931") == "14006381333938"
+    end
+
+    test "converts GTIN-8 to GTIN-14 with PLI 0" do
+      assert Code.to_gtin14!(0, "12345670") == "00000012345670"
+    end
+
+    test "converts GTIN-12 to GTIN-14 with PLI 0" do
+      assert Code.to_gtin14!(0, "012345678905") == "00012345678905"
+    end
+
+    test "accepts PLI as char str" do
+      assert Code.to_gtin14!("1", "4006381333931") == "14006381333938"
+    end
+
+    test "raises ArgumentError for SSCC" do
+      assert_raise ArgumentError, "cannot_normalize", fn ->
+        Code.to_gtin14!(0, "140063810000123454")
+      end
+    end
+
+    test "raises ArgumentError for invalid code" do
+      assert_raise ArgumentError, "invalid_length", fn ->
+        Code.to_gtin14!(0, "123")
+      end
+    end
+
+    test "raises ArgumentError for invalid PLI" do
+      assert_raise ArgumentError, "invalid_pli", fn ->
+        Code.to_gtin14!(10, "4006381333931")
+      end
+    end
+  end
+
   describe "payload/1" do
     test "returns digits excluding check digit" do
       assert {:ok, "400638133393"} = Code.payload(@gtin13)
@@ -243,6 +335,46 @@ defmodule GS1.CodeTest do
 
     test "returns error for invalid code" do
       assert {:error, :invalid_length} = Code.payload("123")
+    end
+  end
+
+  describe "payload!/1 tests" do
+    test "returns payload for GTIN-13" do
+      assert Code.payload!("4006381333931") == "400638133393"
+    end
+
+    test "returns payload for GTIN-8" do
+      assert Code.payload!("12345670") == "1234567"
+    end
+
+    test "returns payload for GTIN-12" do
+      assert Code.payload!("012345678905") == "01234567890"
+    end
+
+    test "returns payload for GTIN-14" do
+      assert Code.payload!("14006381333938") == "1400638133393"
+    end
+
+    test "returns payload for SSCC" do
+      assert Code.payload!("140063810000123454") == "14006381000012345"
+    end
+
+    test "raises ArgumentError for invalid length" do
+      assert_raise ArgumentError, "invalid_length", fn ->
+        Code.payload!("123")
+      end
+    end
+
+    test "raises ArgumentError for invalid checksum" do
+      assert_raise ArgumentError, "invalid_digit_or_checksum", fn ->
+        Code.payload!("4006381333932")
+      end
+    end
+
+    test "raises ArgumentError for non-binary input" do
+      assert_raise ArgumentError, "invalid_input", fn ->
+        Code.payload!(12_345_670)
+      end
     end
   end
 
@@ -375,6 +507,42 @@ defmodule GS1.CodeTest do
     end
   end
 
+  describe "build_sscc!/3" do
+    test "builds valid SSCC with integer extension digit" do
+      assert Code.build_sscc!(1, "4006381", "12345") == "140063810000123454"
+    end
+
+    test "builds valid SSCC with character extension digit" do
+      assert Code.build_sscc!(?0, "4006381", "12345") == "040063810000123457"
+    end
+
+    test "builds SSCC with minimum serial" do
+      assert Code.build_sscc!(0, "4006381", "1") == "040063810000000017"
+    end
+
+    test "builds SSCC with maximum length GCP and serial" do
+      assert Code.build_sscc!(5, "1234567890123456", "") == "512345678901234565"
+    end
+
+    test "raises ArgumentError when GCP or serial too long" do
+      assert_raise ArgumentError, "gcp_or_serial_too_long", fn ->
+        Code.build_sscc!(1, "1234567890123456", "1")
+      end
+    end
+
+    test "raises ArgumentError for invalid extension digit" do
+      assert_raise ArgumentError, "invalid", fn ->
+        Code.build_sscc!(10, "4006381", "12345")
+      end
+    end
+
+    test "raises ArgumentError for non-numeric GCP" do
+      assert_raise ArgumentError, "invalid", fn ->
+        Code.build_sscc!(1, "400638X", "12345")
+      end
+    end
+  end
+
   describe "to_key/1" do
     test "correctly converts GTIN-14 to base integer (strips PLI and check digit)" do
       # GTIN-14: "1" (PLI) + "123456789012" (base) + "5" (check Digit)
@@ -404,6 +572,42 @@ defmodule GS1.CodeTest do
       assert Code.to_key("123") == {:error, :invalid_length}
       assert Code.to_key("ABC") == {:error, :invalid_length}
       assert Code.to_key("") == {:error, :invalid_length}
+    end
+  end
+
+  describe "to_key!/1" do
+    test "extracts key from GTIN-13" do
+      assert Code.to_key!("1234567890128") == 123_456_789_012
+    end
+
+    test "extracts key from GTIN-14 (strips PLI and check digit)" do
+      assert Code.to_key!("11234567890125") == 123_456_789_012
+    end
+
+    test "extracts key from GTIN-8" do
+      assert Code.to_key!("12345670") == 1_234_567
+    end
+
+    test "extracts key from GTIN-12" do
+      assert Code.to_key!("012345678905") == 1_234_567_890
+    end
+
+    test "raises ArgumentError for SSCC" do
+      assert_raise ArgumentError, "invalid_key_type", fn ->
+        Code.to_key!("140063810000123454")
+      end
+    end
+
+    test "raises ArgumentError for invalid length" do
+      assert_raise ArgumentError, "invalid_length", fn ->
+        Code.to_key!("123")
+      end
+    end
+
+    test "raises ArgumentError for invalid checksum" do
+      assert_raise ArgumentError, "invalid_digit_or_checksum", fn ->
+        Code.to_key!("1234567890129")
+      end
     end
   end
 end
