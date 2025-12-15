@@ -96,7 +96,7 @@ defmodule GS1.ValidatorTest do
       config = %ValidatorConfig{required_ais: ["01", "00", "410"]}
 
       {:invalid, errors} = Validator.validate(@ds_valid, config)
-      # Sort for predictable assertion
+      # sort assertion
       errors = Enum.sort_by(errors, & &1.ai)
 
       # must only report "00" and "410" as missing

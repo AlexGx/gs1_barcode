@@ -6,12 +6,12 @@ https://github.com/msupply-foundation/open-msupply/issues/6848
 https://github.com/msupply-foundation/open-msupply/issues/5364
 
 # todo:
-- more rich docs
 - more explain on parser & test cases
 - main module most used funcs
 - why choose? section
-- code generator funcs
 - to_key?
+- add bang! version where needed
+
 
 - more test cases to tokenizer/parser:
 When FNC1 is NOT PERMITTED

@@ -17,9 +17,25 @@ defmodule GS1.Code do
           | :gtin14
           | :sscc
 
+  @code_types [:gtin8, :gtin12, :gtin13, :gtin14, :sscc]
+
+  @gtin8_upper 10_000_000
+  @gtin12_upper 100_000_000_000
+  @gtin13_upper 1_000_000_000_000
+
+  @typedoc "Detect error reason."
   @type detect_error :: :invalid_length | :invalid_input | :invalid_digit_or_checksum
 
+  @typedoc "Normalize error reason."
   @type normalize_error :: :cannot_normalize | :sscc_has_no_product_id
+
+  @typedoc "Generate error reason."
+  @type generate_error ::
+          :invalid_key
+          | :invalid_type
+          | :key_out_of_bounds
+          | :use_to_gtin14
+          | :use_create_sscc
 
   @doc """
   Detects valid GS1 code and returns type.
@@ -45,10 +61,76 @@ defmodule GS1.Code do
   def detect(_), do: {:error, :invalid_input}
 
   @doc """
+  Generates a complete GS1 code GTIN-8,12,13 from integer `key`. For GTIN-14 and SSCC,
+  use the corresponding dedicated functions.
+
+  This function is primarily intended for generating codes in **Restricted Circulation Number (RCN)**
+  ranges (e.g., prefixes 02, 04, 20-29) and other private ranges, which are used for internal company
+  purposes, variable measure items, or region-specific applications.
+
+  **Standard GTINs** for commercial use must be obtained from local GS1 MO.
+  This function does **not** validate if the generated code falls within an allocated
+  standard company prefix range.
+
+  Returns `{:ok, code}` on success, or `{:error, generate_error()}` on failure.
+
+  ## Examples
+
+      iex> GS1.Code.generate(:gtin13, 200000000034)
+      {:ok, "2000000000343"}
+
+      iex> GS1.Code.generate(:gtin14, 200000000034)
+      {:error, :use_to_gtin14}
+  """
+  @spec generate(code_type(), pos_integer()) :: {:error, generate_error()} | {:ok, String.t()}
+
+  def generate(:gtin8, key) when is_integer(key) and key > 0 and key < @gtin8_upper do
+    do_generate(key, 8)
+  end
+
+  def generate(:gtin12, key) when is_integer(key) and key > 0 and key < @gtin12_upper do
+    do_generate(key, 12)
+  end
+
+  def generate(:gtin13, key) when is_integer(key) and key > 0 and key < @gtin13_upper do
+    do_generate(key, 13)
+  end
+
+  def generate(:gtin14, _key), do: {:error, :use_to_gtin14}
+
+  def generate(:sscc, _key), do: {:error, :use_create_sscc}
+
+  def generate(_, key) when is_integer(key), do: {:error, :key_out_of_bounds}
+
+  def generate(code_type, _) when code_type not in @code_types, do: {:error, :invalid_type}
+
+  def generate(_, _), do: {:error, :invalid_key}
+
+  @doc """
+  Bang version of `generate/2`. Raises an `ArgumentError` if the code cannot be
+  generated (e.g., key is out of bounds, invalid type, or attempts to generate SSCC/GTIN-14).
+
+  ## Examples
+
+      iex> GS1.Code.generate!(:gtin13, 200000000034)
+      "2000000000343"
+
+      iex> GS1.Code.generate!(:gtin14, 200000000034)
+      ** (ArgumentError) use_to_gtin14
+  """
+  @spec generate!(code_type(), pos_integer()) :: String.t()
+  def generate!(code_type, key) do
+    case generate(code_type, key) do
+      {:ok, result} -> result
+      {:error, reason} -> raise ArgumentError, Atom.to_string(reason)
+    end
+  end
+
+  @doc """
   Normalizes valid GTIN-8 to a GTIN-12
   Returns error if the input is not a valid GTIN or cannot be normalized to this dimension.
 
-    ## Examples
+  ## Examples
 
       iex> GS1.Code.to_gtin12("40052441")
       {:ok, "000040052441"}
@@ -160,6 +242,18 @@ defmodule GS1.Code do
 
   def to_gtin14(_, _), do: {:error, :invalid_pli}
 
+  def create_sscc(ext, company_prefix, serial) when ext >= ?0 and ext <= ?9 do
+    create_sscc(ext - ?0, company_prefix, serial)
+  end
+
+  def create_sscc(ext, _company_prefix, _serial) when ext in 0..9 do
+    # ext 0 - 9
+    # `company_prefix` + `serial` must be total len = 16
+    # `serial` must be padded with zeros if needed
+    # check_digit at end
+    raise "Not implemented."
+  end
+
   @doc """
   Returns payload (part without check digit) of valid code.
 
@@ -206,7 +300,7 @@ defmodule GS1.Code do
   @doc """
   Lookups usage range of the code (e.g. :rcn, :isbn, :coupon).
 
-  # Examples
+  ## Examples
 
       iex> GS1.Code.range("2000000000039")
       :rcn
@@ -214,7 +308,7 @@ defmodule GS1.Code do
       iex> GS1.Code.range("9781449369996")
       :isbn
   """
-  @spec range(binary()) :: CompanyPrefix.range_type() | {:error, detect_error()}
+  @spec range(String.t()) :: CompanyPrefix.range_type() | {:error, detect_error()}
   def range(code) do
     case detect(code) do
       {:ok, type} ->
@@ -300,6 +394,13 @@ defmodule GS1.Code do
   def refund?(code), do: range(code) == :refund_receipt
 
   # Private section
+
+  defp do_generate(key, len) do
+    # assuming key is valid always here
+    {:ok, check} = CheckDigit.calculate(key)
+    key_with_check = key * 10 + check
+    {:ok, String.pad_leading(key_with_check |> to_string(), len, "0")}
+  end
 
   defp check(code, type) do
     if CheckDigit.valid?(code) do
