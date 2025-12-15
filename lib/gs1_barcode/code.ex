@@ -1,6 +1,6 @@
 defmodule GS1.Code do
   @moduledoc """
-  Utilities for detecting, validating, and normalizing GS1 codes.
+  Utilities for detecting, validating, creating and normalizing GS1 codes.
 
   Handles GTIN-8 (EAN-8 symbology), GTIN-12 (UPC-A symbology), GTIN-13 (GLN, EAN-13 symbology),
   GTIN-14 (ITF-14 symbology) and SSCC-18.
@@ -64,13 +64,12 @@ defmodule GS1.Code do
   Generates a complete GS1 code GTIN-8,12,13 from integer `key`. For GTIN-14 and SSCC,
   use the corresponding dedicated functions.
 
-  This function is primarily intended for generating codes in **Restricted Circulation Number (RCN)**
-  ranges (e.g., prefixes 02, 04, 20-29) and other private ranges, which are used for internal company
-  purposes, variable measure items, or region-specific applications.
+  This function is primarily intended for restoring from key representation or generating codes in
+  **RCN** (Restricted Circulation Number) ranges (e.g., prefixes 02, 04, 20-29) and other private
+  ranges, which are used for internal company purposes, variable measure items, or region-specific applications.
 
   **Standard GTINs** for commercial use must be obtained from local GS1 MO.
-  This function does **not** validate if the generated code falls within an allocated
-  standard company prefix range.
+  This function does **not** validate if the generated code falls within an allocated prefix range.
 
   Returns `{:ok, code}` on success, or `{:error, generate_error()}` on failure.
 
@@ -308,6 +307,50 @@ defmodule GS1.Code do
     case detect(code) do
       {:ok, _} ->
         {:ok, binary_part(code, 0, byte_size(code) - 1)}
+
+      error ->
+        error
+    end
+  end
+
+  @doc """
+  Casts a valid GS1 GTIN code to its pure **base integer representation** by
+  stripping necessary prefixes and **check digit**.
+
+  This representation is the core identification number suitable for storage in a
+  database or use as a unique int key for data lookup.
+
+  Logic for extracting the base int is dependent on the detected code type:
+
+  * **SSCC**: cannot be reduced to a key because it doesn't contains product GTIN.
+      Returns `{:error, :invalid_key_type}`.
+  * **GTIN-14**: base number is derived by stripping both the first char
+      **Indicator (PLI)** and trailing **check digit** (last character).
+  * **Other GTIN codes**: base number is derived by stripping only the trailing **Check Digit**. The remaining digits are converted to an int.
+
+  ## Examples
+
+      iex> GS1.Code.to_key("11234567890125")
+      {:ok, 123456789012} # strips '1' (Indicator) and '8' (Check Digit)
+
+      iex> GS1.Code.to_key("1234567890128")
+      {:ok, 123456789012} # strips '8' (Check Digit)
+
+      iex> GS1.Code.to_key("012345679999999997")  # SSCC cannot be converted
+      {:error, :invalid_key_type}
+  """
+  @spec to_key(String.t()) ::
+          {:error, :invalid_key_type | detect_error()} | {:ok, integer()}
+  def to_key(code) do
+    case detect(code) do
+      {:ok, :sscc} ->
+        {:error, :invalid_key_type}
+
+      {:ok, :gtin14} ->
+        {:ok, binary_part(code, 1, byte_size(code) - 2) |> String.to_integer()}
+
+      {:ok, _} ->
+        {:ok, binary_part(code, 0, byte_size(code) - 1) |> String.to_integer()}
 
       error ->
         error

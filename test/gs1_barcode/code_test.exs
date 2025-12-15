@@ -12,7 +12,7 @@ defmodule GS1.CodeTest do
   # derived from @gtin12 with PLI=1
   @gtin14 "10036000291459"
   # standard SSCC
-  @sscc "000000000000000000"
+  @sscc "012345679999999997"
 
   # Invalid fixtures
   @invalid_length "123"
@@ -286,7 +286,7 @@ defmodule GS1.CodeTest do
     end
 
     test "country lookup  for SSCC" do
-      assert nil == Code.country(@sscc)
+      assert [{"USA", "US", "USA", "840"}] == Code.country(@sscc)
     end
 
     test "country lookup for invalid input" do
