@@ -68,6 +68,11 @@ defmodule GS1.CodeTest do
     test "fails for non-GTIN-8 inputs (cannot downcast larger codes)" do
       assert {:error, :cannot_normalize} = Code.to_gtin12(@gtin13)
     end
+
+    test "fails for code like input" do
+      assert {:error, :invalid_length} = Code.to_gtin12("")
+      assert {:error, :invalid_digit_or_checksum} = Code.to_gtin12(" ffffffffffff")
+    end
   end
 
   describe "to_gtin13/1" do
@@ -94,6 +99,13 @@ defmodule GS1.CodeTest do
     test "fails for SSCC (no product ID)" do
       assert {:error, :cannot_normalize} = Code.to_gtin13(@sscc)
     end
+
+    test "when invalid checksum input" do
+      # invalid GTIN-14
+      assert {:error, :invalid_digit_or_checksum} == Code.to_gtin13("20123456789019")
+      # invalid GTIN-13
+      assert {:error, :invalid_digit_or_checksum} == Code.to_gtin13("0123456789019")
+    end
   end
 
   describe "to_gtin14/2" do
@@ -113,6 +125,20 @@ defmodule GS1.CodeTest do
 
     test "returns error for invalid PLI" do
       assert {:error, :invalid_pli} = Code.to_gtin14(10, @gtin13)
+    end
+
+    test "when already passing gtin14" do
+      assert {:error, :cannot_normalize} == Code.to_gtin14(0, "14006381333938")
+      assert {:error, :cannot_normalize} == Code.to_gtin14(1, "14006381333938")
+    end
+
+    test "when invalid input (checkdigit)" do
+      assert {:error, :invalid_digit_or_checksum} == Code.to_gtin14(0, "4006381333938")
+      assert {:error, :invalid_digit_or_checksum} == Code.to_gtin14(1, "4006381333938")
+    end
+
+    test "build from GTIN-8 with PLI=1" do
+      assert {:ok, _} = Code.to_gtin14(1, @gtin8)
     end
   end
 
@@ -163,10 +189,39 @@ defmodule GS1.CodeTest do
       assert Code.country(@gtin8) == nil
     end
 
-    test "country lookup returns list/tuple for GTIN-13" do
+    test "country lookup returns list/tuple for GTIN-13 and derived from him GTIN-14" do
       # assuming CompanyPrefix.country/1 returns non-nil for "400" (Germany)
       # more complex tests in `GS1.CompanyPrefixTest`
-      assert Code.country(@gtin13) != nil
+      assert nil != Code.country(@gtin13)
+
+      assert nil != Code.country("0" <> @gtin13)
+
+      assert Code.country(@gtin13) == Code.country("0" <> @gtin13)
+    end
+
+    test "country lookup  for SSCC" do
+      assert nil == Code.country(@sscc)
+    end
+
+    test "country lookup for invalid input" do
+      assert {:error, :invalid_digit_or_checksum} == Code.country("4006381333930")
+    end
+  end
+
+  describe "range/1 tests" do
+    test "invalid code input" do
+      assert {:error, :invalid_length} == Code.range("345")
+      assert {:error, :invalid_input} == Code.range(nil)
+      assert {:error, :invalid_digit_or_checksum} == Code.range("4006381333930")
+    end
+
+    test "valid range inputs different cases" do
+      assert :issn == Code.range("9771234567003")
+      assert :rcn == Code.range("2001234567893")
+    end
+
+    test "range/1 GTIN-8 tests" do
+      assert nil == Code.range(@gtin8)
     end
   end
 end

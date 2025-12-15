@@ -99,7 +99,7 @@ defmodule GS1.CompanyPrefixTest do
     end
 
     test "lookup undefined in range8" do
-       assert nil == CompanyPrefix.range8(953)
+      assert nil == CompanyPrefix.range8(953)
     end
   end
 end
