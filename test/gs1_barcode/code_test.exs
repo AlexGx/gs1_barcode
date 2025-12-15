@@ -442,12 +442,12 @@ defmodule GS1.CodeTest do
     end
 
     test "valid range inputs different cases" do
-      assert :issn == Code.range("9771234567003")
-      assert :rcn == Code.range("2001234567893")
+      assert {:ok, :issn} == Code.range("9771234567003")
+      assert {:ok, :rcn} == Code.range("2001234567893")
     end
 
     test "range/1 GTIN-8 tests" do
-      assert nil == Code.range(@gtin8)
+      assert {:ok, nil} == Code.range(@gtin8)
     end
   end
 

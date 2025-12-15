@@ -2,12 +2,12 @@ defmodule GS1Barcode.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/AlexGx/gs1_barcode"
-  @version "0.0.1"
+  @version "0.1.0"
 
   def project do
     [
       app: :gs1_barcode,
-      version: "0.0.1",
+      version: @version,
       elixir: "~> 1.16",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,

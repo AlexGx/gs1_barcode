@@ -11,6 +11,21 @@ defmodule GS1.ParserTest do
       assert Parser.parse("") == {:error, :empty}
     end
 
+    test "success pass with long real data" do
+      input =
+        "01095060001343521124100721S12345678241E003/0023121820000313167000031116300009000191241007-310101"
+
+      {:ok, result} = Parser.parse(input)
+
+      refute Map.has_key?(result.ais, "00")
+      assert Map.has_key?(result.ais, "01")
+
+      assert Map.has_key?(result.ais, "3111")
+      assert Map.has_key?(result.ais, "3131")
+      assert Map.has_key?(result.ais, "90")
+      assert Map.has_key?(result.ais, "91")
+    end
+
     test "returns error for non-binary input" do
       assert Parser.parse(123) == {:error, :invalid_input}
       assert Parser.parse(nil) == {:error, :invalid_input}
@@ -22,6 +37,13 @@ defmodule GS1.ParserTest do
       assert {:error, {:tokenize, reason, pos}} = Parser.parse("BAD_INPUT")
       assert reason == "expected variable-length AI while processing AI segment"
       assert pos == 0
+    end
+
+    test "has invalid character (space, not in GS1 aplhabet)" do
+      invalid = "01000123456000121124100721S12345678241E003/00231210000828013HBD 116"
+
+      # invalid sequence (AI "8013") start at index 58
+      assert {:error, {:tokenize, "expected end of string", 58}} = Parser.parse(invalid)
     end
   end
 
@@ -64,6 +86,8 @@ defmodule GS1.ParserTest do
       assert ai == "3109"
     end
 
+    # this test cases not happens because it caught on tokenize stage
+
     # test "fails if suffix for reconstruction is non-numeric" do
     #   input = "31XX000123"
 
@@ -98,6 +122,62 @@ defmodule GS1.ParserTest do
 
       assert {:error, {:unknown_ai, {ai, _data}}} = Parser.parse(input)
       assert ai == "77"
+    end
+  end
+
+  describe "GS1-128 tests" do
+    @gs1_128 "01040123456789011715012910ABC1233932978471131030005253922471142127649716"
+
+    test "valid GS1-128 with prefix" do
+      prefix = "]C1"
+      input = prefix <> @gs1_128
+
+      assert {:ok, result} = Parser.parse(input)
+
+      assert result.type == :gs1_128
+      assert result.fnc1_prefix == prefix
+      assert map_size(result.ais) == 7
+    end
+  end
+
+  describe "GS-1 DataMatrix tests" do
+    @gs1_dm "0100730822075053173002281010738870112503072002"
+
+    test "valid GS-1 DataMatrix with prefix" do
+      prefix = "]d2"
+      input = prefix <> @gs1_dm
+
+      assert {:ok, result} = Parser.parse(input)
+
+      assert result.type == :gs1_datamatrix
+      assert result.fnc1_prefix == prefix
+      assert map_size(result.ais) == 5
+    end
+
+    test "valid GS-1 DataMatrix without prefix" do
+      assert {:ok, result} = Parser.parse(@gs1_dm)
+      assert result.type == :unknown
+      assert result.fnc1_prefix == ""
+      assert map_size(result.ais) == 5
+    end
+
+    test "invalid GS-1 DataMatrix without prefix with unknown AI" do
+      invalid = "010073082207505373002281010738870112503072002"
+      assert {:error, {:unknown_ai, {"73", "002281010738870"}}} == Parser.parse(invalid)
+    end
+  end
+
+  describe "misc / examples" do
+    test "example how to get start of where tokenization failed" do
+      invalid_input = "]d201106141415432191034567893145"
+
+      assert {:error, {:tokenize, _, invalid_seq_start}} = Parser.parse(invalid_input)
+
+      substring_where_invalid_sequence_started =
+        String.slice(invalid_input, invalid_seq_start..-1//1)
+
+      # string from failed to parse sequence to end:
+      assert "3145" == substring_where_invalid_sequence_started
     end
   end
 end

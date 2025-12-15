@@ -477,24 +477,31 @@ defmodule GS1.Code do
     end
   end
 
-  # TODO: improve
   @doc """
-  Lookups usage range of the code (e.g. `:rcn`, `:isbn`, `:coupon`).
+  Lookups usage range of the valid code.
+
+  Returns `{:ok, range_type}` if found, `{:ok, nil}` if code valid but not in special range,
+  or `{:error, reason}` if the code detection failed
 
   ## Examples
 
       iex> GS1.Code.range("2000000000039")
-      :rcn
+      {:ok, :rcn}
 
       iex> GS1.Code.range("9781449369996")
-      :isbn
+      {:ok, :isbn}
+
+      iex> GS1.Code.range("4006381333931") # GTIN for product with country code prefix
+      {:ok, nil}
   """
-  @spec range(String.t()) :: CompanyPrefix.range_type() | {:error, detect_error()}
+  @spec range(String.t()) :: {:ok, CompanyPrefix.range_type()} | {:error, detect_error()}
   def range(code) do
     case detect(code) do
+      {:ok, :gtin8} ->
+        {:ok, extract_prefix_gs1(code, :gtin8) |> String.to_integer() |> CompanyPrefix.range8()}
+
       {:ok, type} ->
-        prefix = extract_prefix_gs1(code, type) |> String.to_integer()
-        if type == :gtin8, do: CompanyPrefix.range8(prefix), else: CompanyPrefix.range(prefix)
+        {:ok, extract_prefix_gs1(code, type) |> String.to_integer() |> CompanyPrefix.range()}
 
       error ->
         error
@@ -516,7 +523,7 @@ defmodule GS1.Code do
       false
   """
   @spec rcn?(String.t()) :: boolean()
-  def rcn?(code), do: range(code) == :rcn
+  def rcn?(code), do: range(code) == {:ok, :rcn}
 
   @doc """
   Checks if valid code is in range reserved for demonstration or testing.
@@ -527,7 +534,7 @@ defmodule GS1.Code do
       true
   """
   @spec demo?(String.t()) :: boolean()
-  def demo?(code), do: range(code) == :demo
+  def demo?(code), do: range(code) == {:ok, :demo}
 
   @doc """
   Checks if valid code is an ISSN (International Standard Serial Number).
@@ -538,7 +545,7 @@ defmodule GS1.Code do
       true
   """
   @spec issn?(String.t()) :: boolean()
-  def issn?(code), do: range(code) == :issn
+  def issn?(code), do: range(code) == {:ok, :issn}
 
   @doc """
   Checks if valid code is an ISBN (International Standard Book Number).
@@ -549,7 +556,7 @@ defmodule GS1.Code do
       true
   """
   @spec isbn?(String.t()) :: boolean()
-  def isbn?(code), do: range(code) == :isbn
+  def isbn?(code), do: range(code) == {:ok, :isbn}
 
   @doc """
   Checks if valid code is a coupon. Detects various coupon formats, including global
@@ -561,7 +568,13 @@ defmodule GS1.Code do
       true
   """
   @spec coupon?(String.t()) :: boolean()
-  def coupon?(code), do: range(code) in [:coupon, :coupon_local]
+  def coupon?(code) do
+    case range(code) do
+      {:ok, :coupon} -> true
+      {:ok, :coupon_local} -> true
+      _ -> false
+    end
+  end
 
   @doc """
   Checks if valid code is a Refund Receipt.
@@ -572,7 +585,7 @@ defmodule GS1.Code do
       true
   """
   @spec refund?(String.t()) :: boolean()
-  def refund?(code), do: range(code) == :refund_receipt
+  def refund?(code), do: range(code) == {:ok, :refund_receipt}
 
   # Private section
 
