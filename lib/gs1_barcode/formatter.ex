@@ -81,7 +81,7 @@ defmodule GS1.Formatter do
   * `:include` - list of AIs to include. Default `nil` (all).
   * `:prefix` - prefix (e.g., "]d2"). Default is the struct's `fnc1_prefix`.
   * `:group_separator` - character or string used to terminate variable length fields.
-    Default is `Consts.gs_symbol()` (`\\x1D`).
+    Default is `GS1.Consts.gs_symbol/0`.
   """
   @type gs1_opts ::
           {:include, [String.t()] | nil}
@@ -100,9 +100,9 @@ defmodule GS1.Formatter do
 
   1. Prepends the Symbology Identifier (Prefix).
   2. Iterates through AIs.
-  3. If an AI is **variable-length** (e.g., AI 10 or 21) AND it is **not** the last element,
+  3. If an AI is **variable-length** (e.g., AI "10" or "21") AND it is **not** the last element,
      adds the `group_separator`.
-  4. Fixed-length AIs (e.g., 01 or 11) do not receive a separator.
+  4. Fixed-length AIs (e.g., "01" or "11") do not receive a separator.
 
   ## Examples
       iex> ds = %GS1.DataStructure{ais: %{"01" => "09876543210987", "10" => "BATCH123"}, fnc1_prefix: "]d2"}

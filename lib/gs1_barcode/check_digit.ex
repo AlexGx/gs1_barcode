@@ -1,6 +1,6 @@
 defmodule GS1.CheckDigit do
   @moduledoc """
-  GS1 Modulo-10 check digit validation GTINs. Accepts digit-only binaries.
+  GS1 Modulo-10 check digit code validation. Accepts digit-only binaries.
   """
 
   @doc """

@@ -8,7 +8,7 @@ defmodule GS1.Parser do
   by 2 digit "base AI" (than must be normalized and checked and verified with `AIRegistry`) and data part.
   3. **Normalization**: Reconstructs full AIs from tokens (e.g., merging `31` + `03` -> `3103`)
      and performs compliance checks against the `AIRegistry`.
-  4. **Date Structure creation**: Returns `GS1.DataStructure` suitable for further validation and processing.
+  4. **Date Structure creation**: Returns `t:GS1.DataStructure.t/0` suitable for further validation and processing.
   """
 
   alias GS1.AIRegistry
@@ -56,6 +56,7 @@ defmodule GS1.Parser do
         }}
   """
   @spec parse(String.t()) :: {:ok, DataStructure.t()} | {:error, error_reason()}
+
   def parse(<<>>), do: {:error, :empty}
 
   def parse(input) when is_binary(input) do

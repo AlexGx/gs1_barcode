@@ -113,7 +113,7 @@ defmodule GS1.FormatterTest do
     end
 
     test "single variable-length AI (e.g., 10 Batch)" do
-      # even though 10 is variable, it is the last element, so no separator is added
+      # even though "10" is variable, it is the last element, so no separator is added
       input = ds_mock(%{"10" => "BATCH123"})
       assert Formatter.to_gs1(input) == "]d210BATCH123"
     end
@@ -155,7 +155,7 @@ defmodule GS1.FormatterTest do
     test "handles :include option to filter AIs" do
       input = ds_mock(%{"01" => "GTIN", "10" => "BATCH", "21" => "SN"})
 
-      # should only encode 10 and 21
+      # should only encode "10" and "21"
       opts = [include: ["10", "21"]]
 
       expected = "]d2" <> "10BATCH" <> @gs <> "21SN"

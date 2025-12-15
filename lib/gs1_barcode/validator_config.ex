@@ -2,7 +2,7 @@ defmodule GS1.ValidatorConfig do
   @moduledoc """
   GS1 Validator config struct.
 
-  Defines the rules used to validate a parsed `GS1.DataStructure`.
+  Defines the rules used to validate a parsed `t:GS1.DataStructure.t/0`.
   Supports builder style, allowing to chain configuration options.
 
   ## Options

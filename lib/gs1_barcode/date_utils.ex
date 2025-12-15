@@ -7,9 +7,9 @@ defmodule GS1.DateUtils do
   Includes logic for resolving the century based on the GS1 genspec
   and handling zeroed `DD` (day) fields, which signify the last day of the month.
 
-  * **GS1 GenSpec Note on Day Field (DD):**
-      If only the year and month are available, the `DD` field must be filled with two zeroes ("00"),
-      unless otherwise noted by the specific Application Identifier (AI).
+  **GS1 GenSpec Note on Day Field (DD):**
+  If only the year and month are available, the `DD` field must be filled with two zeroes ("00"),
+  unless otherwise noted by the specific Application Identifier (AI).
   """
 
   @type date_format :: :yymmdd | :yymmd0
@@ -24,9 +24,9 @@ defmodule GS1.DateUtils do
 
       iex> GS1.DateUtils.valid?(:yymmdd, "251231")
       true
-      iex> GS1.DateUtils.valid?(:yymmdd, "250230") # invalid (feb 30)
+      iex> GS1.DateUtils.valid?(:yymmdd, "250230") # invalid (Feb 30)
       false
-      iex> GS1.DateUtils.valid?(:yymmdd, "25123") # Invalid length
+      iex> GS1.DateUtils.valid?(:yymmdd, "25123") # invalid length
       false
       iex> GS1.DateUtils.valid?(:yymmdd, "250200") # :yymmdd doesn't allows zeroed `DD`
       false

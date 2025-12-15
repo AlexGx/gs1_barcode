@@ -13,10 +13,11 @@ defmodule GS1.Validator do
   alias GS1.ValidatorConfig
 
   @typedoc """
-  Result of a validation:
-  * `:ok` - signifies that Data Structure passed all validation checks.
-  * `{:invalid, errors}` - when one or more validation checks failed,
-  where `errors` is a list of accumulated `GS1.ValidationError.t()`.
+  Result of a validation.
+
+    * `:ok` - signifies that Data Structure passed all validation checks.
+    * `{:invalid, errors}` - when one or more validation checks failed,
+    where `errors` is a list of accumulated `GS1.ValidationError.t()`.
   """
   @type result :: :ok | {:invalid, [ValidationError.t()]}
 
@@ -27,6 +28,7 @@ defmodule GS1.Validator do
   check digits, dates for predefined set of AIs, and custom DSL constraints.
 
   ## Examples
+
       iex> ds = %GS1.DataStructure{
       ...>  content: "01937123456789043103001234911A2B3C4D5E",
       ...>  type: :unknown,

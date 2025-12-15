@@ -29,7 +29,7 @@ defmodule GS1.DataStructure do
             ais: %{}
 
   @doc """
-  Creates a new Barcode struct.
+  Creates a new `DataStructure` `t:t/0` struct.
 
   The `ais` parameter is normalized to a map if a keyword list is provided.
   """

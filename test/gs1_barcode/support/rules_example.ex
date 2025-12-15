@@ -12,7 +12,7 @@ defmodule GS1.RulesExample do
       # fail_fast: true,
       constraints: %{
         # Lot Number (10): Alphanumeric (regex) AND max 20 chars
-        # (GS1 Spec says AI 10 is up to 20 alphanumeric chars)
+        # (GS1 Spec says AI "10" is up to 20 alphanumeric chars)
         "10" => all(matches(~r/^[A-Za-z0-9]+$/), max_len(20)),
 
         # Expiration (17): Must be YYMMDD format

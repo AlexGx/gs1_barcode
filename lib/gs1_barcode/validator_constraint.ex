@@ -15,6 +15,7 @@ defmodule GS1.Validator.Constraint do
 
   alias GS1.DateUtils
 
+  @typedoc "Validation predicate function that tests a string value against a constraint."
   @type predicate :: (String.t() -> boolean())
 
   # Predicate primitives
@@ -27,7 +28,7 @@ defmodule GS1.Validator.Constraint do
     end
   end
 
-  @doc "Checks if the value has an exact length of `n`."
+  @doc "Checks if the string value has an exact length of `n`."
   @spec len(pos_integer()) :: Macro.t()
   defmacro len(n) when is_integer(n) and n > 0 do
     quote do
@@ -36,7 +37,7 @@ defmodule GS1.Validator.Constraint do
   end
 
   @doc """
-  Checks if the value has a length greater than or equal to `n`.
+  Checks if string value has a length greater than or equal to `n`.
   """
   @spec min_len(pos_integer()) :: Macro.t()
   defmacro min_len(n) when is_integer(n) and n > 0 do
@@ -46,7 +47,7 @@ defmodule GS1.Validator.Constraint do
   end
 
   @doc """
-  Checks if the value has a length less than or equal to `n`.
+  Checks if string value has a length less than or equal to `n`.
   """
   @spec max_len(pos_integer()) :: Macro.t()
   defmacro max_len(n) when is_integer(n) and n > 0 do
@@ -56,7 +57,7 @@ defmodule GS1.Validator.Constraint do
   end
 
   @doc """
-  Checks if the value is an integer string within the range `[min, max]` (inclusive).
+  Checks if value is an integer string within the range `[min, max]` (inclusive).
   """
   @spec between(pos_integer(), pos_integer()) :: Macro.t()
   defmacro between(min, max)
@@ -81,6 +82,21 @@ defmodule GS1.Validator.Constraint do
   end
 
   # Format checkers
+
+  @doc """
+  Generates a validator for a specific pre-defined GS1 data format.
+
+  ## Supported Formats
+
+    * `:date_yymmdd` - validates `YYMMDD` date format and represents a valid calendar date.
+    * `:date_yymmd0` - validates `YYMMD0` format.
+
+  ## Usage
+
+      format(:date_yymmdd)
+  """
+  @spec format(atom()) :: Macro.t()
+  defmacro format(type)
 
   defmacro format(:date_yymmdd) do
     quote do

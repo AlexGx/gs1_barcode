@@ -335,7 +335,7 @@ defmodule GS1.CodeTest do
     end
 
     test "handles serial number that fits exactly without padding" do
-      # GCP: 123456 (6 chars). Available: 10 chars.
+      # GCP: 123456 (6 chars). available: 10 chars.
       # Serial: 1234567890 (10 chars).
       {:ok, sscc} = Code.create_sscc(3, "123456", "1234567890")
       assert String.length(sscc) == 18

@@ -4,7 +4,7 @@ defmodule GS1.AIRegistry do
 
   Provides lookup and validation mechanisms to determine the properties
   of specific AIs, such as whether they expect fixed-length data, require check
-  digit validation, or represent dates (YYMMDD).
+  digit validation, or represent dates (`YYMMDD`).
   """
 
   @fixed_len_ais %{

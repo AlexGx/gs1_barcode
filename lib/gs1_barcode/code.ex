@@ -382,7 +382,7 @@ defmodule GS1.Code do
   end
 
   @doc """
-  Lookups usage range of the code (e.g. :rcn, :isbn, :coupon).
+  Lookups usage range of the code (e.g. `:rcn`, `:isbn`, `:coupon`).
 
   ## Examples
 
@@ -509,13 +509,13 @@ defmodule GS1.Code do
   defp extract_prefix_gs1(<<prefix::binary-size(3), _::binary>>, :gtin13), do: prefix
   defp extract_prefix_gs1(<<prefix::binary-size(3), _::binary>>, :gtin8), do: prefix
 
-  # build 13-digit payload for gtin14, pads lead with extra zeros gtin8 and gtin12
+  # build 13-digit payload for GTIN-14, pads lead with extra zeros GTIN-8 and GTIN-12
   defp build_payload14(pli, code) do
     payload_size = byte_size(code) - 1
     code_payload = binary_part(code, 0, payload_size)
 
     if payload_size == 12 do
-      # gtin13 with payload size = 12 no needs extra padding
+      # GTIN-13 with payload size = 12 no needs extra padding
       to_string(pli) <> code_payload
     else
       to_string(pli) <> String.pad_leading(code_payload, 12, "0")

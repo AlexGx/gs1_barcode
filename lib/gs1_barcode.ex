@@ -9,16 +9,26 @@ defmodule GS1 do
 
   * `GS1.Code`
   * `GS1.Parser`
+  * `GS1.DataStructure`
   * `GS1.Validator`
   * `GS1.Formatter`
 
-  # DSL
+  ## DSL
 
   * `GS1.Validator.Constraint`
 
   ## Utils
 
+  * `GS1.Utils`
   * `GS1.DateUtils`
 
+  ## Foundation
+
+  * `GS1.CheckDigit`
+  * `GS1.CompanyPrefix`
+  * `GS1.AIRegistry`
+  * `GS1.FNC1Prefix`
+  * `GS1.Consts`
+  * `GS1.Tokenizer`
   """
 end

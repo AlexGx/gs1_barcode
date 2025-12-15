@@ -4,7 +4,7 @@ defmodule GS1.Utils do
 
   * GLN validation
   * Converting AI data with implied decimal points into floats.
-  * Converting between GS1 20-digit location strings and WGS84 lat/long coordinates and vise versa.
+  * Converting between GS1 20-digit location strings and WGS84 lat/long coordinates and vice versa.
   """
 
   alias GS1.Code
@@ -97,7 +97,7 @@ defmodule GS1.Utils do
       iex> GS1.Utils.string_20_to_wgs84_lat_log("02790858483015297971")
       {:ok, {-62.0914152, -58.470202900000004}}
   """
-  @spec string_20_to_wgs84_lat_log(any()) :: {:error, :invalid} | {:ok, {float(), float()}}
+  @spec string_20_to_wgs84_lat_log(String.t()) :: {:error, :invalid} | {:ok, {float(), float()}}
   def string_20_to_wgs84_lat_log(<<x::binary-size(10), y::binary-size(10)>>) do
     lat_deg =
       case Integer.parse(x) do
