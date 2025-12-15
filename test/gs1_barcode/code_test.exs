@@ -95,7 +95,7 @@ defmodule GS1.CodeTest do
     end
 
     test "returns specific error for SSCC" do
-      assert {:error, :use_create_sscc} = Code.generate(:sscc, 123)
+      assert {:error, :use_build_sscc} = Code.generate(:sscc, 123)
     end
 
     test "returns error for invalid code type" do
@@ -311,24 +311,24 @@ defmodule GS1.CodeTest do
     end
   end
 
-  describe "create_sscc/3" do
+  describe "build_sscc/3" do
     test "generates valid SSCC with integer extension digit" do
-      assert {:ok, "140063810000123454"} = Code.create_sscc(1, "4006381", "12345")
+      assert {:ok, "140063810000123454"} = Code.build_sscc(1, "4006381", "12345")
     end
 
     test "test when non digit passed in gcp or serial" do
-      assert {:error, :invalid} == Code.create_sscc(1, "4006381a", "12345")
-      assert {:error, :invalid} == Code.create_sscc(1, "4006381", "a2345")
+      assert {:error, :invalid} == Code.build_sscc(1, "4006381a", "12345")
+      assert {:error, :invalid} == Code.build_sscc(1, "4006381", "a2345")
     end
 
     test "generates valid SSCC with char extension digit" do
-      assert {:ok, "040063810000123457"} = Code.create_sscc(?0, "4006381", "12345")
+      assert {:ok, "040063810000123457"} = Code.build_sscc(?0, "4006381", "12345")
     end
 
     test "pads serial number with leading zeros correctly" do
       # GCP: 123 (3 chars), Serial: 1 (1 char)
       # available: 13 chars. Padded: 0000000000001
-      {:ok, sscc} = Code.create_sscc(0, "123", "1")
+      {:ok, sscc} = Code.build_sscc(0, "123", "1")
       assert String.length(sscc) == 18
       # 0 (ext) + 123 (gcp) + 0000000000001 (serial) + check
       assert String.starts_with?(sscc, "01230000000000001")
@@ -337,33 +337,33 @@ defmodule GS1.CodeTest do
     test "handles serial number that fits exactly without padding" do
       # GCP: 123456 (6 chars). available: 10 chars.
       # Serial: 1234567890 (10 chars).
-      {:ok, sscc} = Code.create_sscc(3, "123456", "1234567890")
+      {:ok, sscc} = Code.build_sscc(3, "123456", "1234567890")
       assert String.length(sscc) == 18
       assert String.starts_with?(sscc, "31234561234567890")
     end
 
     test "returns error when serial number is too long for the GCP" do
       # GCP: 1234567890123456 (16 chars). Available: 0 chars.
-      assert {:error, :gcp_or_serial_too_long} = Code.create_sscc(1, "1234567890123456", "1")
+      assert {:error, :gcp_or_serial_too_long} = Code.build_sscc(1, "1234567890123456", "1")
 
       # GCP: 123 (3 chars). Available: 13 chars. Serial: 14 chars.
       long_serial = String.duplicate("1", 14)
-      assert {:error, :gcp_or_serial_too_long} = Code.create_sscc(1, "123", long_serial)
+      assert {:error, :gcp_or_serial_too_long} = Code.build_sscc(1, "123", long_serial)
     end
 
     test "returns error for invalid extension digit" do
-      assert {:error, :invalid} = Code.create_sscc(10, "123", "1")
-      assert {:error, :invalid} = Code.create_sscc(-1, "123", "1")
-      assert {:error, :invalid} = Code.create_sscc(?a, "123", "1")
+      assert {:error, :invalid} = Code.build_sscc(10, "123", "1")
+      assert {:error, :invalid} = Code.build_sscc(-1, "123", "1")
+      assert {:error, :invalid} = Code.build_sscc(?a, "123", "1")
     end
 
     test "returns error for invalid input types" do
       # GCP not binary
-      assert {:error, :invalid} = Code.create_sscc(1, 123, "1")
+      assert {:error, :invalid} = Code.build_sscc(1, 123, "1")
       # Serial not binary
-      assert {:error, :invalid} = Code.create_sscc(1, "123", 1)
+      assert {:error, :invalid} = Code.build_sscc(1, "123", 1)
       # ext not int/char
-      assert {:error, :invalid} = Code.create_sscc("1", "123", "1")
+      assert {:error, :invalid} = Code.build_sscc("1", "123", "1")
     end
   end
 

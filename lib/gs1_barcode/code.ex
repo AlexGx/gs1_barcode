@@ -35,7 +35,7 @@ defmodule GS1.Code do
           | :invalid_type
           | :key_out_of_bounds
           | :use_to_gtin14
-          | :use_create_sscc
+          | :use_build_sscc
 
   @doc """
   Detects valid GS1 code and returns type.
@@ -97,7 +97,7 @@ defmodule GS1.Code do
 
   def generate(:gtin14, _key), do: {:error, :use_to_gtin14}
 
-  def generate(:sscc, _key), do: {:error, :use_create_sscc}
+  def generate(:sscc, _key), do: {:error, :use_build_sscc}
 
   def generate(code_type, _) when code_type not in @code_types, do: {:error, :invalid_type}
 
@@ -149,6 +149,22 @@ defmodule GS1.Code do
   end
 
   @doc """
+  Bang version of `to_gtin12/1`. Raises `ArgumentError` if the code cannot be detected or normalized.
+
+  ## Examples
+
+      iex> GS1.Code.to_gtin12!("40052441")
+      "000040052441"
+  """
+  @spec to_gtin12!(String.t()) :: String.t()
+  def to_gtin12!(code) do
+    case to_gtin12(code) do
+      {:ok, result} -> result
+      {:error, reason} -> raise ArgumentError, Atom.to_string(reason)
+    end
+  end
+
+  @doc """
   Normalizes valid GTIN-8,12 to a GTIN-13.
 
   GTIN-14 is reduced to GTIN-13 by stripping 1-digit Packaging Level Indicator (PLI) and payload
@@ -184,6 +200,22 @@ defmodule GS1.Code do
 
       error ->
         error
+    end
+  end
+
+  @doc """
+  Bang version of `to_gtin13/1`. Raises `ArgumentError` if the code cannot be detected or normalized.
+
+  ## Examples
+
+      iex> GS1.Code.to_gtin13!("12345670")
+      "0000012345670"
+  """
+  @spec to_gtin13!(String.t()) :: String.t()
+  def to_gtin13!(code) do
+    case to_gtin13(code) do
+      {:ok, result} -> result
+      {:error, reason} -> raise ArgumentError, Atom.to_string(reason)
     end
   end
 
@@ -242,6 +274,22 @@ defmodule GS1.Code do
   def to_gtin14(_, _), do: {:error, :invalid_pli}
 
   @doc """
+  Bang version of `to_gtin14/1`. Raises `ArgumentError` if the code cannot be detected or normalized.
+
+  ## Examples
+
+      iex> GS1.Code.to_gtin14!(0, "4006381333931")
+      "04006381333931"
+  """
+  @spec to_gtin14!(non_neg_integer() | char(), String.t()) :: String.t()
+  def to_gtin14!(pli, code) do
+    case to_gtin14(pli, code) do
+      {:ok, result} -> result
+      {:error, reason} -> raise ArgumentError, Atom.to_string(reason)
+    end
+  end
+
+  @doc """
   Generates a valid SSCC (Serial Shipping Container Code) from the Extension Digit,
   GS1 Company Prefix (GCP), and Serial Reference.
 
@@ -257,23 +305,23 @@ defmodule GS1.Code do
 
   ## Examples
 
-      iex> GS1.Code.create_sscc(1, "4006381", "12345")
+      iex> GS1.Code.build_sscc(1, "4006381", "12345")
       {:ok, "140063810000123454"}
 
       # Accepts Extension Digit as char or integer
-      iex> GS1.Code.create_sscc(?0, "4006381", "12345")
+      iex> GS1.Code.build_sscc(?0, "4006381", "12345")
       {:ok, "040063810000123457"}
 
-      iex> GS1.Code.create_sscc(1, "1234567890123456", "1")
+      iex> GS1.Code.build_sscc(1, "1234567890123456", "1")
       {:error, :gcp_or_serial_too_long}
   """
-  @spec create_sscc(non_neg_integer() | char(), binary(), binary()) ::
+  @spec build_sscc(non_neg_integer() | char(), String.t(), String.t()) ::
           {:error, :gcp_or_serial_too_long | :invalid} | {:ok, String.t()}
-  def create_sscc(ext, gcp, serial) when ext >= ?0 and ext <= ?9 do
-    create_sscc(ext - ?0, gcp, serial)
+  def build_sscc(ext, gcp, serial) when ext >= ?0 and ext <= ?9 do
+    build_sscc(ext - ?0, gcp, serial)
   end
 
-  def create_sscc(ext, gcp, serial)
+  def build_sscc(ext, gcp, serial)
       when ext in 0..9 and is_binary(gcp) and
              is_binary(serial) do
     gcp_len = byte_size(gcp)
@@ -292,7 +340,23 @@ defmodule GS1.Code do
     end
   end
 
-  def create_sscc(_ext, _gcp, _serial), do: {:error, :invalid}
+  def build_sscc(_ext, _gcp, _serial), do: {:error, :invalid}
+
+  @doc """
+  Bang version of `build_sscc/3`. Raises `ArgumentError` if invalid arguments passed.
+
+  ## Examples
+
+      iex> GS1.Code.build_sscc!(1, "4006381", "12345")
+      "140063810000123454"
+  """
+  @spec build_sscc!(non_neg_integer() | char(), String.t(), String.t()) :: String.t()
+  def build_sscc!(ext, gcp, serial) do
+    case build_sscc(ext, gcp, serial) do
+      {:ok, result} -> result
+      {:error, reason} -> raise ArgumentError, Atom.to_string(reason)
+    end
+  end
 
   @doc """
   Returns payload (part without check digit) of valid code.
@@ -310,6 +374,22 @@ defmodule GS1.Code do
 
       error ->
         error
+    end
+  end
+
+  @doc """
+  Bang version of `payload/1`. Raises `ArgumentError` if code is invalid (detect error).
+
+  ## Examples
+
+      iex> GS1.Code.payload!("4006381333931")
+      "400638133393"
+  """
+  @spec payload!(String.t()) :: String.t()
+  def payload!(code) do
+    case payload(code) do
+      {:ok, result} -> result
+      {:error, reason} -> raise ArgumentError, Atom.to_string(reason)
     end
   end
 
@@ -340,7 +420,7 @@ defmodule GS1.Code do
       {:error, :invalid_key_type}
   """
   @spec to_key(String.t()) ::
-          {:error, :invalid_key_type | detect_error()} | {:ok, integer()}
+          {:error, :invalid_key_type | detect_error()} | {:ok, pos_integer()}
   def to_key(code) do
     case detect(code) do
       {:ok, :sscc} ->
@@ -354,6 +434,22 @@ defmodule GS1.Code do
 
       error ->
         error
+    end
+  end
+
+  @doc """
+  Bang version of `to_key/1`. Raises `ArgumentError` if the code cannot be detected or normalized.
+
+  ## Examples
+
+      iex> GS1.Code.to_key!("1234567890128")
+      123456789012
+  """
+  @spec to_key!(String.t()) :: pos_integer()
+  def to_key!(code) do
+    case to_key(code) do
+      {:ok, result} -> result
+      {:error, reason} -> raise ArgumentError, Atom.to_string(reason)
     end
   end
 
@@ -381,6 +477,7 @@ defmodule GS1.Code do
     end
   end
 
+  # TODO: improve
   @doc """
   Lookups usage range of the code (e.g. `:rcn`, `:isbn`, `:coupon`).
 

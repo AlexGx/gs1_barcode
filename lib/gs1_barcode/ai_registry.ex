@@ -191,7 +191,7 @@ defmodule GS1.AIRegistry do
   Returns `{min, max}` tuple if the prefix corresponds to a valid GS1 range,
   otherwise `nil`.
   """
-  @spec extended_ai_range_lookup(binary()) :: {pos_integer(), pos_integer()} | nil | no_return()
+  @spec extended_ai_range_lookup(binary()) :: {pos_integer(), pos_integer()} | nil
 
   # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
   def extended_ai_range_lookup(<<a, b, c, _rest::binary>> = ai) when byte_size(ai) == 4 do

@@ -3,10 +3,7 @@ defmodule GS1.ValidatorTest do
 
   doctest GS1.Validator
 
-  alias GS1.AIRegistry
-  alias GS1.CheckDigit
   alias GS1.DataStructure
-  alias GS1.DateUtils
   alias GS1.ValidationError
   alias GS1.Validator
   alias GS1.ValidatorConfig
@@ -38,8 +35,6 @@ defmodule GS1.ValidatorTest do
       "400" => "CUST_NUM_4"
     }
   }
-
-  @valid_config %ValidatorConfig{}
 
   describe "validate/2 - Full Validation Pipeline" do
     test "returns :ok when all checks pass" do
