@@ -18,6 +18,32 @@ defmodule GS1.Parser do
 
   @base_ai_len 2
 
+  @typedoc """
+  Error reasons returned by `parse/1`.
+
+  ## Simple errors
+
+    * `:empty` - input string is empty.
+    * `:invalid_input` - input is not a binary string.
+
+  ## Tokenization errors
+
+    * `{:tokenize, reason, position}` - string structure is invalid or malformed.
+      The `reason` is a description from the tokenizer, and `position` is
+      character index where the invalid sequence begins.
+
+  ## AI processing errors
+
+  All AI errors include a tuple `{ai, data}` containing the AI code
+  and its associated data segment:
+
+    * `{:unknown_ai, {ai, data}}` - AI is not recognized in the registry.
+    * `{:duplicate_ai, {ai, data}}` - same AI appears more than once.
+    * `{:not_enough_data, {ai, data}}` - data segment is too short to
+      reconstruct a 3 or 4 digit AI.
+    * `{:ai_part_non_num, {ai, data}}` - expected numeric digits for the AI
+      suffix during reconstruction, but found non-digit characters.
+  """
   @type error_reason ::
           :empty
           | :invalid_input
@@ -28,7 +54,7 @@ defmodule GS1.Parser do
           | {:ai_part_non_num, {String.t(), String.t()}}
 
   @doc """
-  Parses a raw GS1 string into a `DataStructure`.
+  Parses a raw GS1 string into a `GS1.DataStructure`.
 
   ## Errors
 

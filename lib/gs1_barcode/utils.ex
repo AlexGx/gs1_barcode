@@ -155,6 +155,19 @@ defmodule GS1.Utils do
   end
 
   @doc """
+  Converts WGS84 lat/lon coords into integer representation used by GS1.
+
+  This function applies the offset and scaling factors defined in the GS1 General Specifications
+  but does not format them into the final data field string.
+
+  ## Parameters
+  * `lat_deg`: WGS84 latitude in decimal degrees ([-90.0, 90.0]).
+  * `lon_deg`: WGS84 longitude in decimal degrees ([-180.0 and 180.0]).
+
+  ## Returns
+  * `{:ok, {x_int, y_int}}` - int representations of latitude and longitude.
+  * `{:error, :invalid_lat_lon}` - error if coords is out of range.
+
   ## Examples
 
         iex> GS1.Utils.wgs84_lat_log_to_ints(-62.0914152, -58.470202900000004)
@@ -179,6 +192,8 @@ defmodule GS1.Utils do
   def wgs84_lat_log_to_ints(_, _), do: {:error, :invalid_lat_lon}
 
   @doc """
+  Decodes int `X` component of GS1 location string back into a WGS84 latitude.
+
   ## Examples
 
         iex> GS1.Utils.to_wgs84_latitude_deg(0279085848)
@@ -192,6 +207,8 @@ defmodule GS1.Utils do
   def to_wgs84_latitude_deg(_), do: nil
 
   @doc """
+  Decodes the int `Y` component of GS1 location string back into a WGS84 longitude.
+
   ## Examples
 
         iex> GS1.Utils.to_wgs84_longitude_deg(3015297971)

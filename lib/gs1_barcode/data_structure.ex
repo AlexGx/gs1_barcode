@@ -1,8 +1,17 @@
 defmodule GS1.DataStructure do
   @moduledoc """
-  Decoded GS1 Data Structure, encapsulating AIs, type, prefix, and the original input.
+  Decoded GS1 Data Structure, encapsulating AIs, type, prefix, and original input.
   """
 
+  @typedoc """
+  GS1 barcode symbology type.
+
+    * `:gs1_datamatrix` - GS1 DataMatrix (2D)
+    * `:gs1_qrcode` - GS1 QR Code (2D)
+    * `:gs1_ean` - GS1 EAN/UPC (1D/linear)
+    * `:gs1_128` - GS1-128 (1D/linear, formerly UCC/EAN-128)
+    * `:unknown` - unrecognized or missing symbology identifier
+  """
   @type barcode_type ::
           :gs1_datamatrix
           | :gs1_qrcode
@@ -11,6 +20,10 @@ defmodule GS1.DataStructure do
           | :unknown
 
   @typedoc """
+  Decoded GS1 Data Structure.
+
+  ## Fields
+
   * `content`: input exactly as received, including prefix if exists.
   * `type`: barcode type (e.g., `:gs1_datamatrix`).
   * `ais`: A map of AI code (string) => data (string).
@@ -19,7 +32,7 @@ defmodule GS1.DataStructure do
   @type t :: %__MODULE__{
           content: String.t(),
           type: barcode_type(),
-          ais: %{String.t() => String.t()},
+          ais: %{required(String.t()) => String.t()},
           fnc1_prefix: String.t()
         }
 
@@ -55,7 +68,7 @@ defmodule GS1.DataStructure do
   def type(%__MODULE__{type: type}), do: type
 
   @doc "Returns the map of AI codes and their data values."
-  @spec ais(t()) :: %{String.t() => String.t()}
+  @spec ais(t()) :: %{required(String.t()) => String.t()}
   def ais(%__MODULE__{ais: ais}), do: ais
 
   @doc "Returns the FNC1 prefix binary (<<>> if none was found)."

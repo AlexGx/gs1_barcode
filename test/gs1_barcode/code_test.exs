@@ -59,7 +59,7 @@ defmodule GS1.CodeTest do
     end
   end
 
-  describe "generate/2" do
+  describe "generate/2 and generate!/2" do
     test "generates valid GTIN-8" do
       # 1234567 -> check digit 0 -> 12345670
       assert {:ok, "12345670"} = Code.generate(:gtin8, 1_234_567)
@@ -68,6 +68,14 @@ defmodule GS1.CodeTest do
       {:ok, result} = Code.generate(:gtin8, 5)
       assert String.length(result) == 8
       assert String.starts_with?(result, "0000005")
+    end
+
+    test "banger! tests" do
+      assert "12345670" == Code.generate!(:gtin8, 1_234_567)
+
+      assert_raise ArgumentError, "use_to_gtin14", fn ->
+        Code.generate!(:gtin14, 200_000_000_034)
+      end
     end
 
     test "generates valid GTIN-12" do

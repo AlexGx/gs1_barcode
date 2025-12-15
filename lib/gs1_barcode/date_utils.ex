@@ -12,6 +12,17 @@ defmodule GS1.DateUtils do
   unless otherwise noted by the specific Application Identifier (AI).
   """
 
+  @typedoc """
+  GS1 date format specifier.
+
+    * `:yymmdd` - standard 6-character date format requiring a specific day.
+      The day field (`DD`) must be a valid day of the month (01-31) and
+      cannot be zeroed ("00").
+
+    * `:yymmd0` - extended format that additionally allows a zeroed day field ("00").
+      When `DD` is "00", the date is interpreted as the last day of the specified
+      month.
+  """
   @type date_format :: :yymmdd | :yymmd0
 
   @doc """

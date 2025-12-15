@@ -15,6 +15,7 @@ defmodule GS1.ValidatorConfig do
 
   alias GS1.Validator.Constraint
 
+  @typedoc "Validation strategy and ruleset."
   @type t :: %__MODULE__{
           fail_fast: boolean(),
           required_ais: [String.t()],
@@ -40,7 +41,12 @@ defmodule GS1.ValidatorConfig do
         constraints: %{}
       }
   """
-  @spec new(keyword()) :: t()
+  @spec new(
+          fail_fast: boolean(),
+          required_ais: [String.t()],
+          forbidden_ais: [String.t()],
+          constraints: %{String.t() => Constraint.predicate()}
+        ) :: t()
   def new(opts \\ []) do
     struct!(__MODULE__, opts)
   end
@@ -51,7 +57,7 @@ defmodule GS1.ValidatorConfig do
     do: %__MODULE__{config | fail_fast: fail_fast}
 
   @doc "Sets (replaces) list of required AIs."
-  @spec set_required_ais(t(), list()) :: t()
+  @spec set_required_ais(t(), [String.t()]) :: t()
   def set_required_ais(%__MODULE__{} = config, ais) when is_list(ais),
     do: %__MODULE__{config | required_ais: ais}
 
@@ -61,7 +67,7 @@ defmodule GS1.ValidatorConfig do
     do: %__MODULE__{config | required_ais: [ai | config.required_ais]}
 
   @doc "Sets (replaces) list of forbidden AIs."
-  @spec set_forbidden_ais(t(), list()) :: t()
+  @spec set_forbidden_ais(t(), [String.t()]) :: t()
   def set_forbidden_ais(%__MODULE__{} = config, ais) when is_list(ais),
     do: %__MODULE__{config | forbidden_ais: ais}
 
@@ -71,7 +77,7 @@ defmodule GS1.ValidatorConfig do
     do: %__MODULE__{config | forbidden_ais: [ai | config.forbidden_ais]}
 
   @doc "Sets (replaces) map of constraints."
-  @spec set_constraints(t(), map()) :: t()
+  @spec set_constraints(t(), %{String.t() => Constraint.predicate()}) :: t()
   def set_constraints(%__MODULE__{} = config, constraints) when is_map(constraints),
     do: %__MODULE__{config | constraints: constraints}
 
