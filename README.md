@@ -1,4 +1,4 @@
-# GS1 lib for parsing, validation and formatting
+# Feature-rich GS1 barcode lib for Elixir
 
 ![GS1Barcode](https://raw.githubusercontent.com/AlexGx/gs1_barcode/master/artwork/banner.jpg)
 
@@ -14,6 +14,28 @@
   </a>
 </p>
 
+> 💡 This library parses and processes barcode data — it does not perform image recognition or scanning.
+
+Handle GS1 codes with confidence: detect, generate and validate GTIN/SSCC codes, parse element strings with full AI coverage, enforce business rules, and format for labels or storage.
+
+## Current Features
+
+- 🔍 **Code Detection & Validation** — identify and check GTIN-8/12/13/14 and SSCC-18
+- ⛶ **Symbology Support** - handle 1D linear (EAN, UPC, GS1-128, DataBar) and 2D matrix (DataMatrix, QR Code)
+- 🔄 **Format Conversion** — normalize between GTIN formats, build db keys
+- 🌍 **Prefix Lookup** — identify country (GS1 MO), classify special ranges (RCN, ISBN, ISSN, coupons etc.)
+- 📦 **SSCC Builder** — construct valid SSCC-18 from company prefix and serial reference
+- 🏷️ **Element String Parser** — parse GS1 elements strings with complete Application Identifiers support
+- ✅ **Validation Engine** — validate with built-in GS1 rules and custom industry-specific constraints
+- 📝 **Flexible Formatting** — format to HRI, element strings, and custom label layouts (ZPL, HTML etc.)
+- 🧰 **Utilities** — GLN validation, implied decimal conversion, and WGS84 ↔ GS1 location encoding
+
+## Planned
+
+- [ ] **Extended Validation** — more rules and constrains for specific industries
+- [ ] **Data Field Utilities** — more helpers for parsing and transforming AI data field values
+- [ ] **RFID/EPC Support** — tag encoding and translation between GS1 keys and EPC formats
+
 
 ## Installation
 Add `gs1_barcode` to your list of dependencies in `mix.exs`:
@@ -28,6 +50,16 @@ end
 
 GS1 barcode requires Elixir 1.16 or later, and OTP 25 or later. It may work with earlier versions, but it wasn't tested against them.
 
+## Basic usage
+
+TBD (linear and 2d examples)
+See docs.
+
+
+## References
+
+- [GS1 General Specifications Standard](https://ref.gs1.org/standards/genspecs/)
+- [GS1 Application Identifiers](https://ref.gs1.org/ai/)
 
 ## Disclaimer
 

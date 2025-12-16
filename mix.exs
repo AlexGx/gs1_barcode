@@ -93,14 +93,13 @@ defmodule GS1Barcode.MixProject do
 
   defp docs_guides do
     [
-      "README.md",
-      "guides/installation.md"
+      "README.md"
     ]
   end
 
   defp description do
     """
-    GS1 lib for parsing, validation and formatting.
+    Feature-rich GS1 barcode lib for Elixir.
     """
   end
 end
