@@ -2,7 +2,7 @@ defmodule GS1Barcode.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/AlexGx/gs1_barcode"
-  @version "0.1.0"
+  @version "0.1.1"
 
   def project do
     [
@@ -99,7 +99,7 @@ defmodule GS1Barcode.MixProject do
 
   defp description do
     """
-    Feature-rich GS1 barcode lib for Elixir.
+    Feature-rich GS1 barcode lib for Elixir. Handle GTIN/EAN/UPC/SSCC/QR/DataMatrix GS1 codes with confidence.
     """
   end
 end

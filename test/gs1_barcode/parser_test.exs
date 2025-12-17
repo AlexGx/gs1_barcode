@@ -140,6 +140,8 @@ defmodule GS1.ParserTest do
     end
   end
 
+  00_730_822_075_053
+
   describe "GS-1 DataMatrix tests" do
     @gs1_dm "0100730822075053173002281010738870112503072002"
 
@@ -148,7 +150,6 @@ defmodule GS1.ParserTest do
       input = prefix <> @gs1_dm
 
       assert {:ok, result} = Parser.parse(input)
-
       assert result.type == :gs1_datamatrix
       assert result.fnc1_prefix == prefix
       assert map_size(result.ais) == 5
