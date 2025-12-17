@@ -61,6 +61,25 @@ defmodule GS1.Code do
   def detect(_), do: {:error, :invalid_input}
 
   @doc """
+  Bang version of `detect/1`. Raises an `ArgumentError` if the code is invalid .
+
+  ## Examples
+
+      iex> GS1.Code.detect!("4006381333931")
+      :gtin13
+
+      iex> GS1.Code.detect!("123")
+      ** (ArgumentError) invalid_length
+  """
+  @spec detect!(String.t()) :: code_type()
+  def detect!(code) do
+    case detect(code) do
+      {:ok, result} -> result
+      {:error, reason} -> raise ArgumentError, Atom.to_string(reason)
+    end
+  end
+
+  @doc """
   Generates a complete GS1 code GTIN-8,12,13 from integer `key`. For GTIN-14 and SSCC,
   use the corresponding dedicated functions.
 

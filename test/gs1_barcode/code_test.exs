@@ -59,6 +59,22 @@ defmodule GS1.CodeTest do
     end
   end
 
+  describe "detect!/1 tests" do
+    test "returns atom with type on success" do
+      assert :gtin13 == Code.detect!("2000000000343")
+    end
+
+    test "raises ArgumentError on detect failure" do
+      assert_raise ArgumentError, "invalid_length", fn ->
+        Code.detect!("2000000000")
+      end
+
+      assert_raise ArgumentError, "invalid_input", fn ->
+        Code.detect!(12_345)
+      end
+    end
+  end
+
   describe "generate/2 tests" do
     test "generates valid GTIN-8" do
       # 1234567 -> check digit 0 -> 12345670

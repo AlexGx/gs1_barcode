@@ -32,7 +32,7 @@ Handle GS1 codes with confidence: detect, generate and validate GTIN/SSCC codes,
 
 ## Planned
 
-- [ ] **Extended Validation** — more rules and constrains for specific industries
+- [ ] **Extended Validation** — more rules and constraints for specific industries
 - [ ] **Data Field Utilities** — more helpers for parsing and transforming AI data field values
 - [ ] **RFID/EPC Support** — tag encoding and translation between GS1 keys and EPC formats
 
