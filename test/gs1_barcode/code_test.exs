@@ -417,9 +417,19 @@ defmodule GS1.CodeTest do
       assert Code.issn?(issn_code)
     end
 
-    test "detects Coupon" do
+    test "detects coupon" do
       coupon_code = "9812345678902"
       assert Code.coupon?(coupon_code)
+    end
+
+    test "it is not coupon" do
+      issn_code = "9771234567003"
+      refute Code.coupon?(issn_code)
+    end
+
+    test "detects coupon local" do
+      coupon_code_local = "9902345678924"
+      assert Code.coupon?(coupon_code_local)
     end
 
     test "detects Refund Receipt" do
