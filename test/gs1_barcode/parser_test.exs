@@ -140,8 +140,6 @@ defmodule GS1.ParserTest do
     end
   end
 
-  00_730_822_075_053
-
   describe "GS-1 DataMatrix tests" do
     @gs1_dm "0100730822075053173002281010738870112503072002"
 
