@@ -27,6 +27,55 @@ defmodule GS1.Utils do
   end
 
   @doc """
+  Extracts ISO currency code and amount value from ISO AI data string containing an ISO currency code prefix followed by an amount
+  with an implied decimal point into structured data.
+
+  This function is used for AIs like "391n" where the data field consists of:
+  * 3-digit ISO 4217 currency code (e.g., "978" for EUR, "840" for USD)
+  * Amount with an implied decimal point position (`n` part from AI)
+
+  See `data_to_float/2` for the underlying amount conversion logic.
+
+  ## Parameters
+  * `data`: AI data string starting with a 3-digit ISO currency code followed by the amount
+    (e.g., `"978150"` for €1.50 when `dec_places` is 2).
+  * `dec_places`: The number of digits after the implied decimal point.
+
+  ## Returns
+  * `{:ok, iso_code_str, float_amount}` - on success; note that ISO 4217 currency code validation is not performed.
+  * `{:error, :invalid}` - if the ISO code or amount cannot be parsed.
+  * `{:error, :len_mismatch}` - if the amount part is too short for the given decimal places.
+
+  ## Examples
+
+      iex> GS1.Utils.data_iso_to_float("978150", 2)
+      {:ok, "978", 1.5}
+
+      iex> GS1.Utils.data_iso_to_float("8401000", 0)
+      {:ok, "840", 1000.0}
+
+      iex> GS1.Utils.data_iso_to_float("978099", 2)
+      {:ok, "978", 0.99}
+  """
+  @spec data_iso_to_float(String.t(), any()) ::
+          {:error, :invalid | :len_mismatch} | {:ok, non_neg_integer(), float()}
+  def data_iso_to_float(<<iso::binary-size(3), value::binary>>, dec_places)
+      when is_integer(dec_places) and dec_places >= 0 do
+    case Integer.parse(iso) do
+      {_iso_int, ""} ->
+        case data_to_float(value, dec_places) do
+          {:ok, value} -> {:ok, iso, value}
+          error -> error
+        end
+
+      _ ->
+        {:error, :invalid}
+    end
+  end
+
+  def data_iso_to_float(_, _), do: {:error, :invalid}
+
+  @doc """
   Converts a AIs (like "310x", "320x", etc.) data string, which may contain an
   implied decimal point to float.
 
