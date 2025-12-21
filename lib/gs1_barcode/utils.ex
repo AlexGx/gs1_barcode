@@ -58,7 +58,7 @@ defmodule GS1.Utils do
       {:ok, "978", 0.99}
   """
   @spec data_iso_to_float(String.t(), any()) ::
-          {:error, :invalid | :len_mismatch} | {:ok, non_neg_integer(), float()}
+          {:error, :invalid | :len_mismatch} | {:ok, String.t(), float()}
   def data_iso_to_float(<<iso::binary-size(3), value::binary>>, dec_places)
       when is_integer(dec_places) and dec_places >= 0 do
     case Integer.parse(iso) do

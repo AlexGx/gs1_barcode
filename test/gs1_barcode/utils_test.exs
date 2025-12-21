@@ -23,6 +23,56 @@ defmodule GS1.UtilsTest do
     end
   end
 
+  describe "data_iso_to_float/2" do
+    @iso_eur "978"
+    @iso_usd "840"
+
+    test "converts iso data with an implied decimal point correctly" do
+      assert Utils.data_iso_to_float(@iso_eur <> "3000200", 3) == {:ok, @iso_eur, 3000.2}
+      assert Utils.data_iso_to_float(@iso_usd <> "12345", 2) == {:ok, @iso_usd, 123.45}
+      assert Utils.data_iso_to_float(@iso_eur <> "0005", 3) == {:ok, @iso_eur, 0.005}
+      assert Utils.data_iso_to_float(@iso_usd <> "10", 1) == {:ok, @iso_usd, 1.0}
+    end
+
+    test "converts iso data with zero decimal places correctly" do
+      assert Utils.data_iso_to_float(@iso_eur <> "12345", 0) == {:ok, @iso_eur, 12_345.0}
+      assert Utils.data_iso_to_float(@iso_usd <> "0", 0) == {:ok, @iso_usd, 0.0}
+    end
+
+    test "returns :len_mismatch when iso data length is less than dec_places" do
+      assert Utils.data_iso_to_float(@iso_eur <> "123", 4) == {:error, :len_mismatch}
+      assert Utils.data_iso_to_float(@iso_eur <> "1", 2) == {:error, :len_mismatch}
+      assert Utils.data_iso_to_float(@iso_usd <> "1", 1) == {:error, :len_mismatch}
+    end
+
+    test "returns :len_mismatch when iso data length is equal to dec_places" do
+      assert Utils.data_iso_to_float(@iso_usd <> "123", 3) == {:error, :len_mismatch}
+    end
+
+    # Error cases: :invalid
+
+    test "returns :invalid for non-numeric iso data when dec_places is > 0" do
+      assert Utils.data_iso_to_float(@iso_eur <> "12a45", 2) == {:error, :invalid}
+      assert Utils.data_iso_to_float(@iso_usd <> "", 1) == {:error, :len_mismatch}
+    end
+
+    test "returns :invalid for non-numeric iso data when dec_places is 0" do
+      assert Utils.data_iso_to_float(@iso_eur <> "12a45", 0) == {:error, :invalid}
+      assert Utils.data_iso_to_float(@iso_eur <> "", 0) == {:error, :invalid}
+    end
+
+    test "returns :invalid when ISO part is invalid" do
+      assert Utils.data_iso_to_float("USD" <> "3000200", 3) == {:error, :invalid}
+      assert Utils.data_iso_to_float("X93" <> "12345", 2) == {:error, :invalid}
+    end
+
+    test "returns :invalid for non-string iso data or invalid `dec_places`" do
+      assert Utils.data_iso_to_float(12_345, 2) == {:error, :invalid}
+      assert Utils.data_iso_to_float(nil, 2) == {:error, :invalid}
+      assert Utils.data_iso_to_float("12345", :two) == {:error, :invalid}
+    end
+  end
+
   describe "data_to_float/2" do
     test "converts data with an implied decimal point correctly" do
       assert Utils.data_to_float("3000200", 3) == {:ok, 3000.2}
