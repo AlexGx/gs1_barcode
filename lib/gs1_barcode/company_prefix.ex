@@ -1,6 +1,6 @@
 defmodule GS1.CompanyPrefix do
   @moduledoc """
-  Provides range-based lookup of GS1 Company Prefix allocations to
+  Provides a range-based lookup of GS1 Company Prefix allocations to
   *associate* a barcode prefix with the GS1 Member Organization (MO) that
   administers the corresponding prefix range.
 
@@ -26,7 +26,7 @@ defmodule GS1.CompanyPrefix do
   @type country_mo :: [country_info()] | nil
 
   @typedoc """
-  Special purpose range types:
+  Special-purpose range types:
   * `:rcn` - Restricted Circulation Numbers (internal use)
   * `:issn` - International Standard Serial Number (periodicals)
   * `:isbn` - International Standard Book Number
@@ -206,7 +206,7 @@ defmodule GS1.CompanyPrefix do
   ]
 
   @doc """
-  Looks up GS1 Country (MO) by integer prefix.
+  Looks up a GS1 Country (MO) by integer prefix.
 
   ## Examples
 
@@ -219,7 +219,7 @@ defmodule GS1.CompanyPrefix do
   def country(_), do: nil
 
   @doc """
-  Looks up GS1 range by integer prefix.
+  Looks up a GS1 range by integer prefix.
   Used for **non-GTIN-8** codes.
 
   ## Examples
@@ -233,9 +233,9 @@ defmodule GS1.CompanyPrefix do
   def range(_), do: nil
 
   @doc """
-  Looks up GS1-8 range by integer prefix.
+  Looks up a GS1-8 range by integer prefix.
   Used for **GTIN-8** codes.
-  GTIN-8 has different allocation ranges GTIN-13.
+  GTIN-8 has different allocation ranges from GTIN-13.
 
   ## Examples
 
