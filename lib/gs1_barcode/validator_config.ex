@@ -3,7 +3,7 @@ defmodule GS1.ValidatorConfig do
   GS1 Validator config struct.
 
   Defines the rules used to validate a parsed `t:GS1.DataStructure.t/0`.
-  Supports builder style, allowing chaining of configuration options.
+  Supports builder-style chaining of configuration options.
 
   ## Options
 

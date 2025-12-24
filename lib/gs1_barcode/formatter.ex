@@ -89,7 +89,7 @@ defmodule GS1.Formatter do
           | {:group_separator, String.t()}
 
   @doc """
-  Constructs  GS1 encoded string from the Data Structure.
+  Constructs a GS1-encoded string from the Data Structure.
   Automatically handles the insertion of GS for variable-length AIs.
 
   ## Options

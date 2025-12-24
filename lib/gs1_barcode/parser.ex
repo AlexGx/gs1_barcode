@@ -5,7 +5,7 @@ defmodule GS1.Parser do
   Parsing pipeline:
   1. **Prefix matching**: Identifies the Symbology Identifier (e.g., `]d2` for DataMatrix).
   2. **Tokenization**: Splits the raw string into segments using `Tokenizer`. Each segment is defined
-  by two-digit "base AI" (which must be normalized, checked, and verified with `AIRegistry`) and a data part.
+  by a two-digit "base AI" (which must be normalized, checked, and verified with `AIRegistry`) and a data part.
   3. **Normalization**: Reconstructs full AIs from tokens (e.g., merging `31` + `03` -> `3103`)
      and performs compliance checks against the `AIRegistry`.
   4. **Date Structure creation**: Returns `t:GS1.DataStructure.t/0` suitable for further validation and processing.

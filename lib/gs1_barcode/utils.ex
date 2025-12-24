@@ -27,7 +27,7 @@ defmodule GS1.Utils do
   end
 
   @doc """
-  Extracts an ISO currency code and amount value from ISO AI data string containing an ISO currency code prefix followed by an amount
+  Extracts an ISO currency code and amount value from an ISO AI data string containing an ISO currency code prefix followed by an amount
   with an implied decimal point into structured data.
 
   This function is used for AIs like "391n" where the data field consists of:

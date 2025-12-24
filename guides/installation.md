@@ -1,6 +1,6 @@
 # Installation
 
-This guide walks you through setting up GS1 barcode in your Elixir application.
+This guide walks you through setting up a GS1 barcode lib in your Elixir application.
 
 ## Requirements
 
