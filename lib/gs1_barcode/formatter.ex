@@ -43,12 +43,12 @@ defmodule GS1.Formatter do
       iex> GS1.Formatter.to_hri(ds)
       "(01)09876543210987(10)BATCH123"
 
-  ### 2. Including specific fields Only)
+  ### 2. Including specific fields only
       iex> ds = %GS1.DataStructure{ais: %{"01" => "09876543210987", "10" => "LOT-10"}}
       iex> GS1.Formatter.to_hri(ds, include: ["01"])
       "(01)09876543210987"
 
-  ### 3. Visual Spacing
+  ### 3. Visual spacing
       iex> ds = %GS1.DataStructure{ais: %{"01" => "09876543210987", "10" => "BATCH123"}}
       iex> GS1.Formatter.to_hri(ds, before_ai: " ", after_ai: ": ")
       " (01): 09876543210987 (10): BATCH123"
@@ -79,8 +79,8 @@ defmodule GS1.Formatter do
   Options for formatting GS1.
 
   * `:include` - list of AIs to include. Default `nil` (all).
-  * `:prefix` - prefix (e.g., "]d2"). Default is the struct's `fnc1_prefix`.
-  * `:group_separator` - character or string used to terminate variable length fields.
+  * `:prefix` - prefix (e.g., "]d2"). Default is the struct's `fnc1_prefix`.s
+  * `:group_separator` - character or string used to terminate variable-length fields.
     Default is `GS1.Consts.gs_symbol/0`.
   """
   @type gs1_opts ::
@@ -90,7 +90,7 @@ defmodule GS1.Formatter do
 
   @doc """
   Constructs  GS1 encoded string from the Data Structure.
-  Automatically handles the insertion of GS for var-length AIs.
+  Automatically handles the insertion of GS for variable-length AIs.
 
   ## Options
 
@@ -152,7 +152,7 @@ defmodule GS1.Formatter do
   end
 
   defp build_gs1_string([{ai, data} | rest], sep) do
-    # if AI is NOT in the fixed len list, it is var and needs a separator
+    # if AI is NOT in the fixed len list, it is variable-length and needs a separator
     suffix = if AIRegistry.fixed_len_ai?(ai), do: "", else: sep
     ai <> data <> suffix <> build_gs1_string(rest, sep)
   end

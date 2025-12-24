@@ -24,7 +24,7 @@ defmodule GS1.DataStructure do
 
   ## Fields
 
-  * `content`: input exactly as received, including prefix if exists.
+  * `content`: input exactly as received, including prefix if it exists.
   * `type`: barcode type (e.g., `:gs1_datamatrix`).
   * `ais`: A map of AI code (string) => data (string).
   * `fnc1_prefix`: The FNC1 prefix string (e.g., `"]d2"`), or `""` if none was found.
@@ -59,11 +59,11 @@ defmodule GS1.DataStructure do
 
   # accessors
 
-  @doc "Returns the raw input of barcode."
+  @doc "Returns the raw input of the barcode."
   @spec content(t()) :: String.t()
   def content(%__MODULE__{content: content}), do: content
 
-  @doc "Returns type of the barcode."
+  @doc "Returns the type of the barcode."
   @spec type(t()) :: barcode_type()
   def type(%__MODULE__{type: type}), do: type
 

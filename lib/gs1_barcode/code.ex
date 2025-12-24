@@ -1,6 +1,6 @@
 defmodule GS1.Code do
   @moduledoc """
-  Utilities for detecting, validating, creating and normalizing GS1 codes.
+  Utilities for detecting, validating, creating, and normalizing GS1 codes.
 
   Handles GTIN-8 (EAN-8 symbology), GTIN-12 (UPC-A symbology), GTIN-13 (GLN, EAN-13 symbology),
   GTIN-14 (ITF-14 symbology) and SSCC-18.
@@ -38,7 +38,7 @@ defmodule GS1.Code do
           | :use_build_sscc
 
   @doc """
-  Detects valid GS1 code and returns type.
+  Detects a valid GS1 code and returns its type.
 
   ## Examples
 
@@ -146,7 +146,7 @@ defmodule GS1.Code do
 
   @doc """
   Normalizes valid GTIN-8 to a GTIN-12
-  Returns error if the input is not a valid GTIN or cannot be normalized to this dimension.
+  Returns an error if the input is not a valid GTIN or cannot be normalized to this dimension.
 
   ## Examples
 

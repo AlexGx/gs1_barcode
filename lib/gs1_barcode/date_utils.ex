@@ -2,9 +2,9 @@ defmodule GS1.DateUtils do
   @moduledoc """
   Utilities for handling date formats specified by GS1.
 
-  Provides functionality to validate and convert 6-char GS1 date strings
+  Provides functionality to validate and convert 6-character GS1 date strings
   (in `YYMMDD` or `YYMMD0` format) into `Date.t()`.
-  Includes logic for resolving the century based on the GS1 genspec
+  Includes logic for resolving the century based on the GS1 GenSpec
   and handling zeroed `DD` (day) fields, which signify the last day of the month.
 
   **GS1 GenSpec Note on Day Field (DD):**
@@ -26,7 +26,7 @@ defmodule GS1.DateUtils do
   @type date_format :: :yymmdd | :yymmd0
 
   @doc """
-  Checks if a 6-char string is a valid date in the GS1 `YYMMDD` (`YYMMD0`) format.
+  Checks if a 6-character string is a valid date in the GS1 `YYMMDD` (`YYMMD0`) format.
 
   The `:yymmdd` format **does not** allow a zeroed `DD` part ("00").
   The `:yymmd0` format **does** allow a zeroed `DD` part ("00").
@@ -68,7 +68,7 @@ defmodule GS1.DateUtils do
   def valid?(:yymmdd, _), do: false
 
   @doc """
-  Converts a 6-char GS1 date string (`YYMMDD` or `YYMMD0`) into a `Date.t()`.
+  Converts a 6-character GS1 date string (`YYMMDD` or `YYMMD0`) into a `Date.t()`.
 
   * For `:yymmdd`, the date must be a specific day.
   * For `:yymmd0`, if `DD` is "00", the resultant date is interpreted as the **last day of the month**,
@@ -101,7 +101,7 @@ defmodule GS1.DateUtils do
     end
   end
 
-  # similar to `:yymmdd` but with end of month calculation
+  # similar to `:yymmdd` but with end-of-month calculation
   def to_date(:yymmd0, <<yy::binary-2, mm::binary-2, "00">>) do
     case Integer.parse(yy) do
       {yy_int, ""} ->
@@ -138,7 +138,7 @@ defmodule GS1.DateUtils do
     end
   end
 
-  # year compensation for `YY` according genspec: 7.12 Determination century in dates
+  # year compensation for `YY` according GenSpec: 7.12 Determination century in dates
   defp yy_comp(yy, curr_year \\ Date.utc_today().year)
 
   defp yy_comp(yy, curr_year)

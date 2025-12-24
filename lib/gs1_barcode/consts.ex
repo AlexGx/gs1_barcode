@@ -5,7 +5,7 @@ defmodule GS1.Consts do
 
   # Control characters
 
-  @doc "ASCII Group Separator (ASCII 29, <GS>)"
+  @doc "ASCII Group Separator (ASCII 29, <GS>)."
   @spec gs_symbol :: String.t()
   def gs_symbol, do: "\u001D"
 

@@ -1,13 +1,13 @@
 defmodule GS1.CompanyPrefix do
   @moduledoc """
-  Provides range-based lookup of GS1 Company Prefix allocations in order to
+  Provides range-based lookup of GS1 Company Prefix allocations to
   *associate* a barcode prefix with the GS1 Member Organization (MO) that
   administers the corresponding prefix range.
 
   This association may be used as an informational hint about the country
   in which the GS1 Company Prefix was issued, but it is **not** a structural
-  property of the barcode and **must not** be interpreted as the country of
-  origin of the product.
+  property of the barcode and **must not** be interpreted as the product’s
+  country of origin.
 
   The dataset is based on the public information from:
   [GS1 List of Assigned Country Codes](https://en.wikipedia.org/wiki/List_of_GS1_country_codes),
@@ -16,12 +16,12 @@ defmodule GS1.CompanyPrefix do
   """
 
   @typedoc """
-  Single country's meta tuple: `{Country Name, ISO Alpha-2, ISO Alpha-3, ISO Numeric}`
+  Single country metadata tuple: `{Country Name, ISO Alpha-2, ISO Alpha-3, ISO Numeric}`
   """
   @type country_info :: {String.t(), String.t(), String.t(), String.t()}
 
   @typedoc """
-  List of MO countries (usually one elem) associated with a prefix, or `nil` if the prefix is unassigned.
+  List of MO countries (usually one element) associated with a prefix, or `nil` if the prefix is unassigned.
   """
   @type country_mo :: [country_info()] | nil
 
@@ -198,7 +198,7 @@ defmodule GS1.CompanyPrefix do
     {{990, 999}, :coupon_local}
   ]
 
-  # GTIN-8 has own ranges (see genspec: 1.4.3 GS1-8 Prefix)
+  # GTIN-8 has its own ranges (see GenSpec: 1.4.3 GS1-8 Prefix)
   @prefix_gs1_8 [
     {{000, 099}, :rcn},
     {{200, 299}, :rcn},
@@ -206,7 +206,7 @@ defmodule GS1.CompanyPrefix do
   ]
 
   @doc """
-  Lookups GS1 Country (MO) by int prefix.
+  Looks up GS1 Country (MO) by integer prefix.
 
   ## Examples
 
@@ -219,7 +219,7 @@ defmodule GS1.CompanyPrefix do
   def country(_), do: nil
 
   @doc """
-  Lookups GS1 range by int prefix.
+  Looks up GS1 range by integer prefix.
   Used for **non-GTIN-8** codes.
 
   ## Examples
@@ -233,7 +233,7 @@ defmodule GS1.CompanyPrefix do
   def range(_), do: nil
 
   @doc """
-  Lookups GS1-8 range by int prefix.
+  Looks up GS1-8 range by integer prefix.
   Used for **GTIN-8** codes.
   GTIN-8 has different allocation ranges GTIN-13.
 

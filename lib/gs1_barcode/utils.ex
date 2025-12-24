@@ -10,8 +10,8 @@ defmodule GS1.Utils do
   alias GS1.Code
 
   @doc """
-  Validates if a code structure matches a GLN (Global Location Number).
-  GLN is structurally identical to a GTIN-13 but relies on context.
+  Validates whether a code structure matches a GLN (Global Location Number).
+  A GLN is structurally identical to a GTIN-13 but relies on context.
 
   ## Examples
 
@@ -27,22 +27,22 @@ defmodule GS1.Utils do
   end
 
   @doc """
-  Extracts ISO currency code and amount value from ISO AI data string containing an ISO currency code prefix followed by an amount
+  Extracts an ISO currency code and amount value from ISO AI data string containing an ISO currency code prefix followed by an amount
   with an implied decimal point into structured data.
 
   This function is used for AIs like "391n" where the data field consists of:
-  * 3-digit ISO 4217 currency code (e.g., "978" for EUR, "840" for USD)
+  * a 3-digit ISO 4217 currency code (e.g., "978" for EUR, "840" for USD)
   * Amount with an implied decimal point position (`n` part from AI)
 
   See `data_to_float/2` for the underlying amount conversion logic.
 
   ## Parameters
-  * `data`: AI data string starting with a 3-digit ISO currency code followed by the amount
+  * `data` - AI data string starting with a 3-digit ISO currency code followed by the amount
     (e.g., `"978150"` for €1.50 when `dec_places` is 2).
-  * `dec_places`: The number of digits after the implied decimal point.
+  * `dec_places` - number of digits after the implied decimal point.
 
   ## Returns
-  * `{:ok, iso_code_str, float_amount}` - on success; note that ISO 4217 currency code validation is not performed.
+  * `{:ok, iso_code_str, float_amount}` - on success; note that ISO 4217 currency code validation is **not** performed.
   * `{:error, :invalid}` - if the ISO code or amount cannot be parsed.
   * `{:error, :len_mismatch}` - if the amount part is too short for the given decimal places.
 
@@ -76,16 +76,16 @@ defmodule GS1.Utils do
   def data_iso_to_float(_, _), do: {:error, :invalid}
 
   @doc """
-  Converts a AIs (like "310x", "320x", etc.) data string, which may contain an
-  implied decimal point to float.
+  Converts data strings a AIs (like "310x", "320x", etc.) data string, which may contain an
+  implied decimal point into a float.
 
   The `dec_places` parameter specifies how many digits from the right of the string
-  represent the fractional part. See genspec: 7.8.7 Application Identifiers with implied
-  decimal point positions
+  represent the fractional part. See GenSpec section 7.8.7: "Application Identifiers with implied
+  decimal point positions".
 
   ## Parameters
-  * `data`: AI data part (e.g., `"3000200"`).
-  * `dec_places`: The number of digits after the implied decimal point (e.g., `3`).
+  * `data` - AI data part (e.g., `"3000200"`).
+  * `dec_places` - number of digits after the implied decimal point (e.g., `3`).
 
   ## Returns
   * `{:ok, float()}` - if conversion is successful.
@@ -126,7 +126,7 @@ defmodule GS1.Utils do
   def data_to_float(_, _), do: {:error, :invalid}
 
   @doc """
-  Converts a 20-char data string (e.g., AI "8200") to WGS84 lat, lon coords.
+  Converts a 20-character data string (e.g., AI "8200") to WGS84 lat, lon coords.
 
   Input is split into two 10-char parts:
   * First 10 characters encode **latitude** (X).
@@ -138,8 +138,8 @@ defmodule GS1.Utils do
   * `data`: A 20-char binary/string containing the encoded coordinates.
 
   ## Returns
-  * `{:ok, {latitude, longitude}}`  - where both are floats.
-  * `{:error, :invalid}` -  if the input is not a 20-char binary or parts are invalid.
+  * `{:ok, {latitude, longitude}}` - where both values are floats.
+  * `{:error, :invalid}` -  if the input is not a 20-character binary or the parts are invalid.
 
   ## Examples
 
@@ -170,10 +170,10 @@ defmodule GS1.Utils do
   def string_20_to_wgs84_lat_log(_), do: {:error, :invalid}
 
   @doc """
-  Converts WGS84 lan, lon coords to 20-char GS1 encoded string.
+  Converts WGS84 lan, lon coords to a 20-character GS1 encoded string.
 
   The resulting string is formatted as a 10-digit encoded latitude followed by a 10-digit encoded longitude.
-  Each encoded integer is padded with leading zeros to ensure a 10-char length.
+  Each encoded integer is padded with leading zeros to ensure a 10-character length.
   This is the reverse operation of `string_20_to_wgs84_lat_log/1`.
 
   ## Parameters
@@ -181,8 +181,8 @@ defmodule GS1.Utils do
   * `lon_deg`: WGS84 longitude in decimal degrees ($-180.0$ to $180.0$).
 
   ## Returns
-  * `{:ok, String.t()}` - 20-char encoded string.
-  * `{:error, :invalid_lat_lon}` - when input coords are outside the valid WGS84 range.
+  * `{:ok, String.t()}` - 20-character encoded string.
+  * `{:error, :invalid_lat_lon}` - when input coordinates are outside the valid WGS84 range.
 
   ## Examples
 
@@ -204,7 +204,7 @@ defmodule GS1.Utils do
   end
 
   @doc """
-  Converts WGS84 lat/lon coords into integer representation used by GS1.
+  Converts WGS84 lat/lon coordinates into the integer representation used by GS1.
 
   This function applies the offset and scaling factors defined in the GS1 General Specifications
   but does not format them into the final data field string.
@@ -215,7 +215,7 @@ defmodule GS1.Utils do
 
   ## Returns
   * `{:ok, {x_int, y_int}}` - int representations of latitude and longitude.
-  * `{:error, :invalid_lat_lon}` - error if coords is out of range.
+  * `{:error, :invalid_lat_lon}` - error if coordinates is out of range.
 
   ## Examples
 
@@ -241,7 +241,7 @@ defmodule GS1.Utils do
   def wgs84_lat_log_to_ints(_, _), do: {:error, :invalid_lat_lon}
 
   @doc """
-  Decodes int `X` component of GS1 location string back into a WGS84 latitude.
+  Decodes the integer `X` component of a GS1 location string back into a WGS84 latitude.
 
   ## Examples
 
@@ -256,7 +256,7 @@ defmodule GS1.Utils do
   def to_wgs84_latitude_deg(_), do: nil
 
   @doc """
-  Decodes the int `Y` component of GS1 location string back into a WGS84 longitude.
+  Decodes the integer `Y` component of GS1 location string back into a WGS84 longitude.
 
   ## Examples
 

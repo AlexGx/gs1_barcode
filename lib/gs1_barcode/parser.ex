@@ -5,7 +5,7 @@ defmodule GS1.Parser do
   Parsing pipeline:
   1. **Prefix matching**: Identifies the Symbology Identifier (e.g., `]d2` for DataMatrix).
   2. **Tokenization**: Splits the raw string into segments using `Tokenizer`. Each segment is defined
-  by 2 digit "base AI" (than must be normalized and checked and verified with `AIRegistry`) and data part.
+  by two digit "base AI" (which must be normalized, checked, and verified with `AIRegistry`) and a data part.
   3. **Normalization**: Reconstructs full AIs from tokens (e.g., merging `31` + `03` -> `3103`)
      and performs compliance checks against the `AIRegistry`.
   4. **Date Structure creation**: Returns `t:GS1.DataStructure.t/0` suitable for further validation and processing.
@@ -63,7 +63,7 @@ defmodule GS1.Parser do
     * `:empty` - input string is empty.
     * `:invalid_input` - input is not a binary string.
     * `{:tokenize, reason, invalid_seq_start}` - string structure is invalid or malformed.
-        An `invalid_seq_start` is an index of bad sequence in input string.
+        An `invalid_seq_start` is an index of a bad sequence in the input string.
     * `{:unknown_ai, {ai, data}}` - AI is not recognized
     * `{:duplicate_ai, {ai, data}}` - same AI appears twice
     * `{:not_enough_data, {ai, data}}` - string ends prematurely for a AI.
@@ -165,7 +165,7 @@ defmodule GS1.Parser do
     else
       {taken, rest} = String.split_at(data, take)
 
-      # check if the taken part is numeric, otherwise it's invalid format
+      # check if the taken part is numeric, otherwise it's an invalid format
       if String.match?(taken, ~r/^\d+$/) do
         {:ok, {ai <> taken, rest}}
       else

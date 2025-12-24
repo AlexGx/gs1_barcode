@@ -3,7 +3,7 @@ defmodule GS1.AIRegistry do
   GS1 Application Identifier Registry.
 
   Provides lookup and validation mechanisms to determine the properties
-  of specific AIs, such as whether they expect fixed-length data, require check
+  of specific AIs, such as whether they expect fixed-length data, require a check
   digit validation, or represent dates (`YYMMDD`).
   """
 
@@ -22,7 +22,7 @@ defmodule GS1.AIRegistry do
     "16" => 8,
     "17" => 8,
 
-    # logistics, counts etc.
+    # logistics, counts, etc.
     "20" => 4,
     "31" => 10,
     "32" => 10,
@@ -100,7 +100,7 @@ defmodule GS1.AIRegistry do
   Determines if a given string is a valid GS1 Application Identifier.
 
   This checks if the string exists in the standard registry or falls within
-  valid numeric ranges for 3 and 4 digit AIs.
+  valid numeric ranges for 3- and 4-digit AIs.
 
   ## Examples
 
@@ -113,7 +113,7 @@ defmodule GS1.AIRegistry do
   @spec compliant?(String.t()) :: boolean()
   def compliant?(ai) when is_binary(ai) do
     case byte_size(ai) do
-      # "fastlane" for two digit AIs
+      # "fastlane" for two-digit AIs
       2 -> length_by_base_ai(ai) == 2
       3 -> ai_in_range?(ai)
       4 -> ai_in_range?(ai)
@@ -130,7 +130,7 @@ defmodule GS1.AIRegistry do
   # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
   def length_by_base_ai(<<a, b>>) do
     case <<a, b>> do
-      # two digit
+      # two-digit
       "00" -> 2
       "01" -> 2
       "02" -> 2
@@ -187,7 +187,7 @@ defmodule GS1.AIRegistry do
   def length_by_base_ai(_), do: nil
 
   @doc """
-  Lookups the numeric range for 3 and 4 digit AIs.
+  Looks up the numeric range for 3- and 4-digit AIs.
   Returns `{min, max}` tuple if the prefix corresponds to a valid GS1 range,
   otherwise `nil`.
   """
