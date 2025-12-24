@@ -1,7 +1,7 @@
 defmodule GS1.Tokenizer.Base do
   @moduledoc """
   Compile–time base for GS1 tokenizers based on NimbleParsec.
-  The tokenizer is deliberately “dumb”: it does not perform GS1 specific semantic checks or validations.
+  The tokenizer is deliberately “dumb”: it does not perform GS1-specific semantic checks or validations.
 
   The tokenizer **always returns AI prefixes in their minimal, two-digit form**,
   even when the actual GS1 AI is longer.

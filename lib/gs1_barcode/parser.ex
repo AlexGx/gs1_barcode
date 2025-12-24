@@ -5,7 +5,7 @@ defmodule GS1.Parser do
   Parsing pipeline:
   1. **Prefix matching**: Identifies the Symbology Identifier (e.g., `]d2` for DataMatrix).
   2. **Tokenization**: Splits the raw string into segments using `Tokenizer`. Each segment is defined
-  by two digit "base AI" (which must be normalized, checked, and verified with `AIRegistry`) and a data part.
+  by two-digit "base AI" (which must be normalized, checked, and verified with `AIRegistry`) and a data part.
   3. **Normalization**: Reconstructs full AIs from tokens (e.g., merging `31` + `03` -> `3103`)
      and performs compliance checks against the `AIRegistry`.
   4. **Date Structure creation**: Returns `t:GS1.DataStructure.t/0` suitable for further validation and processing.
@@ -40,7 +40,7 @@ defmodule GS1.Parser do
     * `{:unknown_ai, {ai, data}}` - AI is not recognized in the registry.
     * `{:duplicate_ai, {ai, data}}` - same AI appears more than once.
     * `{:not_enough_data, {ai, data}}` - data segment is too short to
-      reconstruct a 3 or 4 digit AI.
+      reconstruct a 3- or 4-digit AI.
     * `{:ai_part_non_num, {ai, data}}` - expected numeric digits for the AI
       suffix during reconstruction, but found non-digit characters.
   """
@@ -137,7 +137,7 @@ defmodule GS1.Parser do
       nil ->
         {:error, {:unknown_ai, {ai, data}}}
 
-      # reconstruct and check 3 and 4 digit AIs
+      # reconstruct and check 3- and 4-digit AIs
       len when len in [3, 4] ->
         reconstruct_and_verify(ai, data, len)
 

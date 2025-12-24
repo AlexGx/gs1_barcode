@@ -9,7 +9,7 @@ defmodule GS1.ValidationError do
     * `:invalid_check_digit` - AI data field failed with checksum validation.
     * `:invalid_date` - AI date field (YYMMDD) validation failed
     * `:missing_ai` - Required AI missing in Data Structure.
-    * `:forbidden_ai` - AI was present in Data Structure that is not allowed in validation context.
+    * `:forbidden_ai` - AI was present in the Data Structure that is not allowed in the validation context.
     * `:constraint_ai` - AI violates constraint check.
   """
   @type code ::
@@ -26,7 +26,7 @@ defmodule GS1.ValidationError do
 
     * `:code` - error code (see `t:code/0`).
     * `:ai` - Application Identifier (AI) associated with the error.
-    * `:message` - user friendly error message.
+    * `:message` - user-friendly error message.
   """
   @type t :: %__MODULE__{
           code: code(),

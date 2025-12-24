@@ -15,7 +15,7 @@ defmodule GS1.Validator do
   @typedoc """
   Result of a validation.
 
-    * `:ok` - signifies that Data Structure passed all validation checks.
+    * `:ok` - signifies that the Data Structure passed all validation checks.
     * `{:invalid, errors}` - when one or more validation checks failed,
     where `errors` is a list of accumulated `GS1.ValidationError.t()`.
   """
@@ -25,7 +25,7 @@ defmodule GS1.Validator do
   Validates a GS1 Data Structure against a given configuration.
 
   The validation process is a pipeline of checks: required AIs, forbidden AIs,
-  check digits, dates for predefined set of AIs, and custom DSL constraints.
+  check digits, dates for a predefined set of AIs, and custom DSL constraints.
 
   ## Examples
 
@@ -67,7 +67,7 @@ defmodule GS1.Validator do
 
   # required routine
 
-  # no `fail_fast` because it is first in chain
+  # no `fail_fast` because it is first in the chain
   # defp check_required([_ | _] = errors, _ds, %ValidatorConfig{fail_fast: true}), do: errors
 
   defp check_required(errors, ds, %ValidatorConfig{required_ais: required_ais}) do

@@ -3,11 +3,11 @@ defmodule GS1.ValidatorConfig do
   GS1 Validator config struct.
 
   Defines the rules used to validate a parsed `t:GS1.DataStructure.t/0`.
-  Supports builder style, allowing to chain configuration options.
+  Supports builder style, allowing chaining of configuration options.
 
   ## Options
 
-    * `:fail_fast` - If `true`, validation stops when error found. Defaults to `true`.
+    * `:fail_fast` - If `true`, validation stops when an error is found. Defaults to `true`.
     * `:required_ais` - list of AIs that **must** appear in the Data Structure.
     * `:forbidden_ais` - ist of AIs that **must NOT** appear.
     * `:constraints` - map of custom validation functions keyed by AI.

@@ -76,8 +76,8 @@ defmodule GS1.Utils do
   def data_iso_to_float(_, _), do: {:error, :invalid}
 
   @doc """
-  Converts data strings a AIs (like "310x", "320x", etc.) data string, which may contain an
-  implied decimal point into a float.
+  Converts data string AIs (like "310x", "320x", etc.), which may contain an
+  implied decimal point, into a float.
 
   The `dec_places` parameter specifies how many digits from the right of the string
   represent the fractional part. See GenSpec section 7.8.7: "Application Identifiers with implied
@@ -128,14 +128,14 @@ defmodule GS1.Utils do
   @doc """
   Converts a 20-character data string (e.g., AI "8200") to WGS84 lat, lon coords.
 
-  Input is split into two 10-char parts:
+  Input is split into two 10-character parts:
   * First 10 characters encode **latitude** (X).
   * Second 10 characters encode **longitude** (Y).
 
   The conversion logic is defined by GS1 specifications for location encoding.
 
   ## Parameters
-  * `data`: A 20-char binary/string containing the encoded coordinates.
+  * `data`: A 20-character binary/string containing the encoded coordinates.
 
   ## Returns
   * `{:ok, {latitude, longitude}}` - where both values are floats.
@@ -170,7 +170,7 @@ defmodule GS1.Utils do
   def string_20_to_wgs84_lat_log(_), do: {:error, :invalid}
 
   @doc """
-  Converts WGS84 lan, lon coords to a 20-character GS1 encoded string.
+  Converts WGS84 lat, lon coords to a 20-character GS1-encoded string.
 
   The resulting string is formatted as a 10-digit encoded latitude followed by a 10-digit encoded longitude.
   Each encoded integer is padded with leading zeros to ensure a 10-character length.
@@ -215,7 +215,7 @@ defmodule GS1.Utils do
 
   ## Returns
   * `{:ok, {x_int, y_int}}` - int representations of latitude and longitude.
-  * `{:error, :invalid_lat_lon}` - error if coordinates is out of range.
+  * `{:error, :invalid_lat_lon}` - error if the coordinates are out of range.
 
   ## Examples
 
@@ -241,7 +241,7 @@ defmodule GS1.Utils do
   def wgs84_lat_log_to_ints(_, _), do: {:error, :invalid_lat_lon}
 
   @doc """
-  Decodes the integer `X` component of a GS1 location string back into a WGS84 latitude.
+  Decodes the integer `X` component of the GS1 location string back into a WGS84 latitude.
 
   ## Examples
 
@@ -256,7 +256,7 @@ defmodule GS1.Utils do
   def to_wgs84_latitude_deg(_), do: nil
 
   @doc """
-  Decodes the integer `Y` component of GS1 location string back into a WGS84 longitude.
+  Decodes the integer `Y` component of the GS1 location string back into a WGS84 longitude.
 
   ## Examples
 

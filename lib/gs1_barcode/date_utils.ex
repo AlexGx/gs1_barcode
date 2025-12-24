@@ -138,7 +138,7 @@ defmodule GS1.DateUtils do
     end
   end
 
-  # year compensation for `YY` according GenSpec: 7.12 Determination century in dates
+  # year compensation for `YY` according to GenSpec: 7.12 "Determination century in dates"
   defp yy_comp(yy, curr_year \\ Date.utc_today().year)
 
   defp yy_comp(yy, curr_year)
